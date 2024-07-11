@@ -1,15 +1,17 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Main from './pages/Main'; 
-import './App.css';
+import Header from './components/Header';
+import BoardPage from './pages/BoardPage';
+import './styles/App.css';
 
 function App() {
   return (
     <div className="App">
       <Router>
+        <Header />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/main" element={<Main />} />
+          <Route path="/board" element={<BoardPage />} />
         </Routes>
       </Router>
     </div>
@@ -21,7 +23,7 @@ function Home() {
     <header className="App-header">
       <h1>Main Page</h1>
       <nav>
-        <a href="/main">Go to Main Page</a>
+        <a href="/board">보드 페이지로 이동</a>
       </nav>
     </header>
   );

@@ -1,0 +1,12 @@
+.board {
+    background-color: #f0f0f0;
+    padding: 20px;
+    border-radius: 8px;
+    margin-right: 20px;
+  }
+  
+  .board-title {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+  }
+  
