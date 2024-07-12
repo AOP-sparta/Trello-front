@@ -4,22 +4,19 @@ import styles from '../styles/Board.module.css';
 
 function Board() {
   const [selectedBoard, setSelectedBoard] = useState('');
-  const [columns, setColumns] = useState([]); 
-  
-
-  const [boards, setBoards] = useState ({
+  const [boards, setBoards] = useState({
     '보드 1': {
       columns: [
-        { title: '🗒️ To Do', cards: [{ text: 'Task 1', user: 'OOO 님' }, { text: 'Task 2', user: 'OOO 님' }] },
-        { title: '💻 In Progress', cards: [{ text: 'Task 3', user: 'OOO 님' }, { text: 'Task 4', user: 'OOO 님' }] },
-        { title: '🚀 Done', cards: [{ text: 'Task 5', user: 'OOO 님' }, { text: 'Task 6', user: 'OOO 님' }] },
+        { id: 1, title: '🗒️ To Do', cards: [{ text: 'Task 1', user: 'OOO 님' }, { text: 'Task 2', user: 'OOO 님' }] },
+        { id: 2, title: '💻 In Progress', cards: [{ text: 'Task 3', user: 'OOO 님' }, { text: 'Task 4', user: 'OOO 님' }] },
+        { id: 3, title: '🚀 Done', cards: [{ text: 'Task 5', user: 'OOO 님' }, { text: 'Task 6', user: 'OOO 님' }] },
       ],
     },
     '보드 2': {
       columns: [
-        { title: '🗒️ To Do', cards: [{ text: 'Task A', user: 'OOO 님' }, { text: 'Task B', user: 'OOO 님' }] },
-        { title: '💻 In Progress', cards: [{ text: 'Task C', user: 'OOO 님' }, { text: 'Task D', user: 'OOO 님' }] },
-        { title: '🚀 Done', cards: [{ text: 'Task E', user: 'OOO 님' }, { text: 'Task F', user: 'OOO 님' }] },
+        { id: 4, title: '🗒️ To Do', cards: [{ text: 'Task A', user: 'OOO 님' }, { text: 'Task B', user: 'OOO 님' }] },
+        { id: 5, title: '💻 In Progress', cards: [{ text: 'Task C', user: 'OOO 님' }, { text: 'Task D', user: 'OOO 님' }] },
+        { id: 6, title: '🚀 Done', cards: [{ text: 'Task E', user: 'OOO 님' }, { text: 'Task F', user: 'OOO 님' }] },
       ],
     },
   });
@@ -28,13 +25,10 @@ function Board() {
     setSelectedBoard(event.target.value);
   };
 
-  // const handleDeleteColumn = (columnTitle) => {
-  //   setColumns(prevColumns => prevColumns.filter(column => column.title !== columnTitle));
-  // };
-  const handleDeleteColumn = (columnTitle) => {
+  const handleDeleteColumn = (columnId) => {
     setBoards(prevBoards => {
       const updatedBoards = { ...prevBoards };
-      updatedBoards[selectedBoard].columns = updatedBoards[selectedBoard].columns.filter(column => column.title !== columnTitle);
+      updatedBoards[selectedBoard].columns = updatedBoards[selectedBoard].columns.filter(column => column.id !== columnId);
       return updatedBoards;
     });
   };
@@ -53,8 +47,8 @@ function Board() {
         </select>
       </div>
       <div className={styles.columns}>
-        {selectedColumns.map((column, index) => (
-          <Column key={index} title={column.title} cards={column.cards} onDeleteColumn={handleDeleteColumn} />
+        {selectedColumns.map((column) => (
+          <Column key={column.id} id={column.id} title={column.title} cards={column.cards} onDeleteColumn={handleDeleteColumn} />
         ))}
       </div>
     </div>

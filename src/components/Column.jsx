@@ -6,7 +6,7 @@ import styles from '../styles/Column.module.css';
 import EditModal from './EditModal';
 import DeleteModal from './DeleteModal';
 
-function Column({ title, cards, onDeleteColumn }) {
+function Column({ id, title, cards, onDeleteColumn }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [columnTitle, setColumnTitle] = useState(title);
@@ -18,9 +18,10 @@ function Column({ title, cards, onDeleteColumn }) {
   const handleDeleteClick = () => {
     setIsDeleting(true);
   };
-  
+
   const handleCloseModal = () => {
     setIsEditing(false);
+    setIsDeleting(false);
   };
 
   const handleSaveModal = (newTitle) => {
@@ -31,7 +32,7 @@ function Column({ title, cards, onDeleteColumn }) {
 
   const handleConfirmDelete = () => {
     setIsDeleting(false);
-    onDeleteColumn(columnTitle); 
+    onDeleteColumn(id);
     alert(`컬럼 삭제: ${columnTitle}`);
   };
 
@@ -41,7 +42,7 @@ function Column({ title, cards, onDeleteColumn }) {
         <h2>{columnTitle}</h2>
         <div className={styles.columnIcons}>
           <MdEdit className={styles.editIcon} onClick={handleEditClick} />
-          <FaTrashAlt className={styles.deleteIcon} onClick={handleDeleteClick}/>
+          <FaTrashAlt className={styles.deleteIcon} onClick={handleDeleteClick} />
         </div>
       </div>
       {isEditing && (

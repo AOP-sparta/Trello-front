@@ -4,9 +4,9 @@
   
   .columns {
     display: flex;
-    justify-content: space-between;
+    /* justify-content: space-between; */
   }
-  
+
   .selectBoard {
     margin: 20px 0;
   }
