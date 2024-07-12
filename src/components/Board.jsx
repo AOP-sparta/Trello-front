@@ -4,12 +4,10 @@ import styles from '../styles/Board.module.css';
 
 function Board() {
   const [selectedBoard, setSelectedBoard] = useState('');
+  const [columns, setColumns] = useState([]); 
+  
 
-  const handleBoardChange = (event) => {
-    setSelectedBoard(event.target.value);
-  };
-
-  const boards = {
+  const [boards, setBoards] = useState ({
     '보드 1': {
       columns: [
         { title: '🗒️ To Do', cards: [{ text: 'Task 1', user: 'OOO 님' }, { text: 'Task 2', user: 'OOO 님' }] },
@@ -24,6 +22,21 @@ function Board() {
         { title: '🚀 Done', cards: [{ text: 'Task E', user: 'OOO 님' }, { text: 'Task F', user: 'OOO 님' }] },
       ],
     },
+  });
+
+  const handleBoardChange = (event) => {
+    setSelectedBoard(event.target.value);
+  };
+
+  // const handleDeleteColumn = (columnTitle) => {
+  //   setColumns(prevColumns => prevColumns.filter(column => column.title !== columnTitle));
+  // };
+  const handleDeleteColumn = (columnTitle) => {
+    setBoards(prevBoards => {
+      const updatedBoards = { ...prevBoards };
+      updatedBoards[selectedBoard].columns = updatedBoards[selectedBoard].columns.filter(column => column.title !== columnTitle);
+      return updatedBoards;
+    });
   };
 
   const selectedColumns = boards[selectedBoard]?.columns || [];
@@ -41,7 +54,7 @@ function Board() {
       </div>
       <div className={styles.columns}>
         {selectedColumns.map((column, index) => (
-          <Column key={index} title={column.title} cards={column.cards} />
+          <Column key={index} title={column.title} cards={column.cards} onDeleteColumn={handleDeleteColumn} />
         ))}
       </div>
     </div>

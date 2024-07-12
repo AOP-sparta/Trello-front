@@ -5,3 +5,38 @@
     width: 30%;
   }
   
+  .columnHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  
+  .columnHeader h2 {
+    margin: 0;
+  }
+  
+  .columnIcons {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .editIcon,
+  .deleteIcon {
+    cursor: pointer;
+    font-size: 18px;
+    color: #888;
+  }
+  
+  .editIcon:hover,
+  .deleteIcon:hover {
+    color: #555;
+  }
+  
+  .editBox {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 10px;
+  }
+  
