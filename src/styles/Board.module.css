@@ -7,3 +7,29 @@
     justify-content: space-between;
   }
   
+  .selectBoard {
+    margin: 20px 0;
+  }
+  
+  .selectBoard label {
+    margin-right: 10px;
+    font-weight: bold;
+  }
+  
+  .selectBoard select {
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #f9f9f9;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  
+  .selectBoard select:hover {
+    border-color: #888;
+  }
+  
+  .selectBoard select:focus {
+    border-color: #555;
+  }
