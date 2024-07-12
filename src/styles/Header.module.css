@@ -8,9 +8,27 @@
   .headerTitle {
     font-size: 24px;
     font-weight: bold;
+    text-decoration: none;  
+    color: #333;
   }
   
-  .headerButtons button {
-    margin-left: 10px;
+  .headerTitle:hover {
+    color: #555;  
+  }
+
+  .headerButtons {
+    display: flex;
+    gap: 10px;
   }
   
+  .headerButton {
+    padding: 10px 20px;
+    text-decoration: none;
+    color: #333;
+    border-radius: 5px;
+  }
+  
+  .headerButton:hover {
+    background-color: #f0f0f0;
+    color: #555;
+  }
