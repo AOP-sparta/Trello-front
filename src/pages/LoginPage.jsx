@@ -1,9 +1,10 @@
 import React from 'react';
+import Login from '../components/Login';
 
 function LoginPage() {
   return (
-    <div className="login">
-      <h2>로그인</h2>
+    <div className="login-page">
+      <Login />
     </div>
   );
 }
