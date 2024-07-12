@@ -1,10 +1,11 @@
 import React from 'react';
+import styles from '../styles/Header.module.css';
 
 function Header() {
   return (
-    <header className="header">
-      <div className="header-title">Trello</div>
-      <div className="header-buttons">
+    <header className={styles.header}>
+      <div className={styles.headerTitle}>Trello</div>
+      <div className={styles.headerButtons}>
         <button>로그인</button>
         <button>회원가입</button>
       </div>
@@ -13,4 +14,3 @@ function Header() {
 }
 
 export default Header;
-

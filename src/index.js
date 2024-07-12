@@ -1,13 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './styles/App.css';
-import Header from './components/Header';
-import BoardPage from './pages/BoardPage';
+import App from './App'; 
 
-ReactDOM.render(
-  <React.StrictMode>
-    <Header />
-    <BoardPage />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+ReactDOM.render(<App />, document.getElementById('root'));
