@@ -4,6 +4,7 @@ import styles from '../styles/Board.module.css';
 
 function Board() {
   const [selectedBoard, setSelectedBoard] = useState('');
+  
   const [boards, setBoards] = useState({
     '보드 1': {
       columns: [
@@ -33,6 +34,17 @@ function Board() {
     });
   };
 
+  const handleAddCard = (columnId, newCard) => {
+    setBoards(prevBoards => {
+      const updatedBoards = { ...prevBoards };
+      const columnIndex = updatedBoards[selectedBoard].columns.findIndex(column => column.id === columnId);
+      if (columnIndex !== -1) {
+        updatedBoards[selectedBoard].columns[columnIndex].cards.push(newCard);
+      }
+      return updatedBoards;
+    });
+  };
+
   const selectedColumns = boards[selectedBoard]?.columns || [];
 
   return (
@@ -48,7 +60,14 @@ function Board() {
       </div>
       <div className={styles.columns}>
         {selectedColumns.map((column) => (
-          <Column key={column.id} id={column.id} title={column.title} cards={column.cards} onDeleteColumn={handleDeleteColumn} />
+          <Column
+            key={column.id}
+            id={column.id}
+            title={column.title}
+            cards={column.cards}
+            onDeleteColumn={handleDeleteColumn}
+            onAddCard={handleAddCard}
+          />
         ))}
       </div>
     </div>

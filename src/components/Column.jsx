@@ -6,11 +6,13 @@ import Card from './Card';
 import styles from '../styles/Column.module.css';
 import EditModal from './EditModal';
 import DeleteModal from './DeleteModal';
+import CardModal from './CardModal'; // 추가: CardModal import
 
 function Column({ id, title, cards, onDeleteColumn, onAddCard }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [columnTitle, setColumnTitle] = useState(title);
+  const [isAddingCard, setIsAddingCard] = useState(false); // 수정: 초기값 false로 설정
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -20,9 +22,14 @@ function Column({ id, title, cards, onDeleteColumn, onAddCard }) {
     setIsDeleting(true);
   };
 
+  const handleAddCardClick = () => {
+    setIsAddingCard(true);
+  };
+
   const handleCloseModal = () => {
     setIsEditing(false);
     setIsDeleting(false);
+    setIsAddingCard(false);
   };
 
   const handleSaveModal = (newTitle) => {
@@ -37,9 +44,9 @@ function Column({ id, title, cards, onDeleteColumn, onAddCard }) {
     alert(`컬럼 삭제: ${columnTitle}`);
   };
 
-  const handleAddCard = () => {
-    const newCard = { text: 'New Task', user: 'OOO 님' }; // default new card data
+  const handleSaveCard = (newCard) => {
     onAddCard(id, newCard);
+    setIsAddingCard(false);
   };
 
   return (
@@ -69,11 +76,17 @@ function Column({ id, title, cards, onDeleteColumn, onAddCard }) {
             confirmText="삭제"
           />
         )}
+        {isAddingCard && ( 
+          <CardModal
+            onClose={handleCloseModal}
+            onSave={handleSaveCard}
+          />
+        )}
         {cards.map((card, index) => (
           <Card key={index} text={card.text} user={card.user} />
         ))}
       </div>
-      <div className={styles.addCardIcon} onClick={handleAddCard}>
+      <div className={styles.addCardIcon} onClick={handleAddCardClick}>
         <MdAddCircleOutline size={24} />
         <div>Add card</div>
       </div>
