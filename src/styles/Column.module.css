@@ -1,10 +1,11 @@
 .column {
     background-color: #f4f4f4;
     padding: 10px;
+    border-radius: 7px;
     margin: 0 10px;
     width: 30%;
   }
-  
+
   .columnHeader {
     display: flex;
     align-items: center;
@@ -40,3 +41,22 @@
     margin-top: 10px;
   }
   
+  .addCardIcon {
+    cursor: pointer;
+    margin-top: 20px;
+    color: grey;
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-radius: 5px;
+    justify-content: center;
+  }
+  
+  .addCardIcon:hover {
+    background-color: #e5e5e5;
+  }
+  
+  .addCardIcon svg {
+    color: grey; 
+    margin-right: 8px;
+  }
