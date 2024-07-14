@@ -5,7 +5,7 @@ import styles from '../styles/Board.module.css';
 
 function Board() {
   const [selectedBoard, setSelectedBoard] = useState('');
-  
+
   const [boards, setBoards] = useState({
     '보드 1': {
       columns: [
@@ -52,9 +52,9 @@ function Board() {
       return;
     }
 
-    const newColumnId = new Date().getTime(); 
+    const newColumnId = new Date().getTime();
     const newColumn = { id: newColumnId, title: 'New Column', cards: [] };
-    
+
     setBoards(prevBoards => {
       const updatedBoards = { ...prevBoards };
       updatedBoards[selectedBoard].columns.push(newColumn);
@@ -63,6 +63,16 @@ function Board() {
   };
 
   const selectedColumns = boards[selectedBoard]?.columns || [];
+
+  const chunkColumns = (columns, chunkSize) => {
+    const chunkedArray = [];
+    for (let i = 0; i < columns.length; i += chunkSize) {
+      chunkedArray.push(columns.slice(i, i + chunkSize));
+    }
+    return chunkedArray;
+  };
+
+  const chunkedColumns = chunkColumns(selectedColumns, 3);
 
   return (
     <div className={styles.board}>
@@ -79,16 +89,20 @@ function Board() {
           <span className={styles.addColumnText}>Add Column</span>
         </div>
       </div>
-      <div className={styles.columns}>
-        {selectedColumns.map((column) => (
-          <Column
-            key={column.id}
-            id={column.id}
-            title={column.title}
-            cards={column.cards}
-            onDeleteColumn={handleDeleteColumn}
-            onAddCard={handleAddCard}
-          />
+      <div>
+        {chunkedColumns.map((chunk, index) => (
+          <div key={index} className={styles.columns}>
+            {chunk.map((column) => (
+              <Column
+                key={column.id}
+                id={column.id}
+                title={column.title}
+                cards={column.cards}
+                onDeleteColumn={handleDeleteColumn}
+                onAddCard={handleAddCard}
+              />
+            ))}
+          </div>
         ))}
       </div>
     </div>
