@@ -36,12 +36,26 @@
     border-color: #555;
   }
 
-  .addColumnIcon {
+  .addColumnButton {
+    display: flex;
+    align-items: center;
     cursor: pointer;
     color: grey;
     margin-left: 10px;
+    padding: 5px 10px; 
+    border-radius: 5px; 
+    padding: 10px 20px; 
   }
   
-  .addColumnIcon:hover {
-    color: #555;
+  .addColumnButton:hover {
+    background-color: #e5e5e5; 
+    color: grey; 
+  }
+  
+  .addColumnIcon {
+    margin-right: 5px;
+  }
+  
+  .addColumnText {
+    color: inherit; 
   }

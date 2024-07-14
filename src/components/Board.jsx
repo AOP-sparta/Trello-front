@@ -47,6 +47,11 @@ function Board() {
   };
 
   const handleAddColumn = () => {
+    if (!selectedBoard) {
+      alert('Please select a board first.');
+      return;
+    }
+
     const newColumnId = new Date().getTime(); 
     const newColumn = { id: newColumnId, title: 'New Column', cards: [] };
     
@@ -69,7 +74,10 @@ function Board() {
           <option value="보드 1">보드 1</option>
           <option value="보드 2">보드 2</option>
         </select>
-        <MdAddCircleOutline className={styles.addColumnIcon} size={24} onClick={handleAddColumn} /> 
+        <div className={styles.addColumnButton} onClick={handleAddColumn}>
+          <MdAddCircleOutline className={styles.addColumnIcon} size={24} />
+          <span className={styles.addColumnText}>Add Column</span>
+        </div>
       </div>
       <div className={styles.columns}>
         {selectedColumns.map((column) => (
