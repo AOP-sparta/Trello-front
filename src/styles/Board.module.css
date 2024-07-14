@@ -4,11 +4,13 @@
   
   .columns {
     display: flex;
-    /* justify-content: space-between; */
+    margin-bottom: 20px;
   }
 
   .selectBoard {
     margin: 20px 0;
+    display: flex;
+    align-items: center;
   }
   
   .selectBoard label {
@@ -17,13 +19,13 @@
   }
   
   .selectBoard select {
+    margin-left: 10px;
     padding: 10px;
     border: 2px solid #ccc;
     border-radius: 5px;
     font-size: 16px;
     background-color: #f9f9f9;
     outline: none;
-    transition: border-color 0.3s;
   }
   
   .selectBoard select:hover {
@@ -33,3 +35,86 @@
   .selectBoard select:focus {
     border-color: #555;
   }
+
+  .addColumnButton {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: grey;
+    margin-left: 10px;
+    padding: 10px 20px; 
+    border-radius: 5px; 
+  }
+  
+  .addColumnButton:hover {
+    background-color: #e5e5e5; 
+    color: grey; 
+  }
+  
+  .addColumnIcon {
+    margin-right: 5px;
+  }
+  
+  .addColumnText {
+    color: inherit; 
+  }
+
+  .modalOpen {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+  }
+  
+  .modalClosed {
+    display: none;
+  }
+  
+  .modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    z-index: 1010;
+    width: 300px;
+  }
+  
+  .modal h2 {
+    margin-bottom: 10px;
+  }
+  
+  .modal input {
+    width: calc(100% - 40px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+  
+  .modal button {
+    margin-right: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    background-color: #007bff;
+    cursor: pointer;
+  }
+  
+  .modal button:hover {
+    background-color: #0056b3;
+  }
+  
+  .modal button:last-child {
+    margin-right: 0;
+  }
+  

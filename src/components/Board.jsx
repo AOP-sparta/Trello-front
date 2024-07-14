@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import { MdAddCircleOutline } from 'react-icons/md';
 import Column from './Column';
+import ColumnModal from './ColumnModal';
 import styles from '../styles/Board.module.css';
 
 function Board() {
   const [selectedBoard, setSelectedBoard] = useState('');
-  
   const [boards, setBoards] = useState({
     '보드 1': {
       columns: [
@@ -22,22 +23,26 @@ function Board() {
     },
   });
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const handleBoardChange = (event) => {
     setSelectedBoard(event.target.value);
   };
 
   const handleDeleteColumn = (columnId) => {
-    setBoards(prevBoards => {
+    setBoards((prevBoards) => {
       const updatedBoards = { ...prevBoards };
-      updatedBoards[selectedBoard].columns = updatedBoards[selectedBoard].columns.filter(column => column.id !== columnId);
+      updatedBoards[selectedBoard].columns = updatedBoards[selectedBoard].columns.filter(
+        (column) => column.id !== columnId
+      );
       return updatedBoards;
     });
   };
 
   const handleAddCard = (columnId, newCard) => {
-    setBoards(prevBoards => {
+    setBoards((prevBoards) => {
       const updatedBoards = { ...prevBoards };
-      const columnIndex = updatedBoards[selectedBoard].columns.findIndex(column => column.id === columnId);
+      const columnIndex = updatedBoards[selectedBoard].columns.findIndex((column) => column.id === columnId);
       if (columnIndex !== -1) {
         updatedBoards[selectedBoard].columns[columnIndex].cards.push(newCard);
       }
@@ -45,7 +50,35 @@ function Board() {
     });
   };
 
+  const handleAddColumn = (title) => {
+    if (!selectedBoard) {
+      alert('Please select a board first.');
+      return;
+    }
+
+    const newColumnId = new Date().getTime();
+    const newColumn = { id: newColumnId, title: title, cards: [] }; // 입력한 컬럼의 제목 사용
+
+    setBoards((prevBoards) => {
+      const updatedBoards = { ...prevBoards };
+      updatedBoards[selectedBoard].columns.push(newColumn);
+      return updatedBoards;
+    });
+
+    setIsModalOpen(false); // 모달 닫기
+  };
+
   const selectedColumns = boards[selectedBoard]?.columns || [];
+
+  const chunkColumns = (columns, chunkSize) => {
+    const chunkedArray = [];
+    for (let i = 0; i < columns.length; i += chunkSize) {
+      chunkedArray.push(columns.slice(i, i + chunkSize));
+    }
+    return chunkedArray;
+  };
+
+  const chunkedColumns = chunkColumns(selectedColumns, 3);
 
   return (
     <div className={styles.board}>
@@ -57,19 +90,28 @@ function Board() {
           <option value="보드 1">보드 1</option>
           <option value="보드 2">보드 2</option>
         </select>
+        <div className={styles.addColumnButton} onClick={() => setIsModalOpen(true)}>
+          <MdAddCircleOutline className={styles.addColumnIcon} size={24} />
+          <span className={styles.addColumnText}>Add Column</span>
+        </div>
       </div>
-      <div className={styles.columns}>
-        {selectedColumns.map((column) => (
-          <Column
-            key={column.id}
-            id={column.id}
-            title={column.title}
-            cards={column.cards}
-            onDeleteColumn={handleDeleteColumn}
-            onAddCard={handleAddCard}
-          />
+      <div>
+        {chunkedColumns.map((chunk, index) => (
+          <div key={index} className={styles.columns}>
+            {chunk.map((column) => (
+              <Column
+                key={column.id}
+                id={column.id}
+                title={column.title}
+                cards={column.cards}
+                onDeleteColumn={handleDeleteColumn}
+                onAddCard={handleAddCard}
+              />
+            ))}
+          </div>
         ))}
       </div>
+      <ColumnModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAddColumn={handleAddColumn} />
     </div>
   );
 }
