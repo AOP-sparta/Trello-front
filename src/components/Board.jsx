@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { MdAddCircleOutline } from 'react-icons/md';
 import Column from './Column';
 import styles from '../styles/Board.module.css';
 
@@ -45,6 +46,17 @@ function Board() {
     });
   };
 
+  const handleAddColumn = () => {
+    const newColumnId = new Date().getTime(); 
+    const newColumn = { id: newColumnId, title: 'New Column', cards: [] };
+    
+    setBoards(prevBoards => {
+      const updatedBoards = { ...prevBoards };
+      updatedBoards[selectedBoard].columns.push(newColumn);
+      return updatedBoards;
+    });
+  };
+
   const selectedColumns = boards[selectedBoard]?.columns || [];
 
   return (
@@ -57,6 +69,7 @@ function Board() {
           <option value="보드 1">보드 1</option>
           <option value="보드 2">보드 2</option>
         </select>
+        <MdAddCircleOutline className={styles.addColumnIcon} size={24} onClick={handleAddColumn} /> 
       </div>
       <div className={styles.columns}>
         {selectedColumns.map((column) => (
