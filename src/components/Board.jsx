@@ -25,7 +25,8 @@ function Board() {
     },
   });
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isColumnModalOpen, setIsColumnModalOpen] = useState(false);
+  const [isBoardModalOpen, setIsBoardModalOpen] = useState(false);
 
   const handleBoardChange = (event) => {
     setSelectedBoard(event.target.value);
@@ -59,7 +60,7 @@ function Board() {
     }
 
     const newColumnId = new Date().getTime();
-    const newColumn = { id: newColumnId, title: title, cards: [] }; // 입력한 컬럼의 제목 사용
+    const newColumn = { id: newColumnId, title: title, cards: [] };
 
     setBoards((prevBoards) => {
       const updatedBoards = { ...prevBoards };
@@ -67,11 +68,11 @@ function Board() {
       return updatedBoards;
     });
 
-    setIsModalOpen(false); // 모달 닫기
+    setIsColumnModalOpen(false);
   };
 
   const handleAddBoard = (boardName, boardDescription) => {
-    const newBoardKey = boardName.trim(); // 보드 이름에서 공백 제거
+    const newBoardKey = boardName.trim();
     const newBoard = {
       columns: [],
       description: boardDescription,
@@ -83,21 +84,18 @@ function Board() {
     }));
 
     setSelectedBoard(newBoardKey);
-    setIsModalOpen(false); // 모달 닫기
+    setIsBoardModalOpen(false);
   };
 
   const handleEditBoard = () => {
-    // 보드 수정 기능을 구현하세요
     alert('보드 수정 기능을 구현하세요');
   };
 
   const handleDeleteBoard = () => {
-    // 보드 삭제 기능을 구현하세요
     alert('보드 삭제 기능을 구현하세요');
   };
 
   const handleInviteUser = () => {
-    // 사용자 초대 기능을 구현하세요
     alert('사용자 초대 기능을 구현하세요');
   };
 
@@ -117,7 +115,7 @@ function Board() {
     <div className={styles.board}>
       <span className={styles.boardIcons}>
         <span className={styles.boardText}>Board</span>
-        <MdAddCircleOutline onClick={() => setIsModalOpen(true)} className={styles.boardIcon} size={25} />
+        <MdAddCircleOutline onClick={() => setIsBoardModalOpen(true)} className={styles.boardIcon} size={25} />
         <MdEdit onClick={handleEditBoard} className={styles.boardIcon} size={25} />
         <FaTrashAlt onClick={handleDeleteBoard} className={styles.boardIcon} size={23} />
         <FaUserPlus onClick={handleInviteUser} className={styles.boardIcon} size={24} />
@@ -133,7 +131,7 @@ function Board() {
             <option key={boardKey} value={boardKey}>{boardKey}</option>
           ))}
         </select>
-        <div className={styles.addColumnButton} onClick={() => setIsModalOpen(true)}>
+        <div className={styles.addColumnButton} onClick={() => setIsColumnModalOpen(true)}>
           <MdAddCircleOutline className={styles.addColumnIcon} size={24} />
           <span className={styles.addColumnText}>Add Column</span>
         </div>
@@ -154,7 +152,8 @@ function Board() {
           </div>
         ))}
       </div>
-      <BoardModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAddBoard={handleAddBoard} />
+      <ColumnModal isOpen={isColumnModalOpen} onClose={() => setIsColumnModalOpen(false)} onAddColumn={handleAddColumn} />
+      <BoardModal isOpen={isBoardModalOpen} onClose={() => setIsBoardModalOpen(false)} onAddBoard={handleAddBoard} />
     </div>
   );
 }

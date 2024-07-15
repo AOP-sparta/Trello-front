@@ -6,7 +6,7 @@ import Card from './Card';
 import styles from '../styles/Column.module.css';
 import EditModal from './EditModal';
 import DeleteModal from './DeleteModal';
-import CardModal from './CardModal'; // 추가: CardModal import
+import CardModal from './CardModal'; 
 
 function Column({ id, title, cards, onDeleteColumn, onAddCard }) {
   const [isEditing, setIsEditing] = useState(false);
