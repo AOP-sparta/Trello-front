@@ -3,6 +3,7 @@ import { MdAddCircleOutline, MdEdit } from 'react-icons/md';
 import { FaTrashAlt, FaUserPlus } from 'react-icons/fa';
 import Column from './Column';
 import ColumnModal from './ColumnModal';
+import BoardModal from './BoardModal';
 import styles from '../styles/Board.module.css';
 
 function Board() {
@@ -25,6 +26,7 @@ function Board() {
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBoardModalOpen, setIsBoardModalOpen] = useState(false); 
 
   const handleBoardChange = (event) => {
     setSelectedBoard(event.target.value);
@@ -69,23 +71,35 @@ function Board() {
     setIsModalOpen(false); // 모달 닫기
   };
 
-  const handleAddBoard = () => {
-    alert('보드 추가 기능을 구현하세요');
+  // 보드 추가
+  const handleAddBoard = (name, description) => {
+    const newBoard = {
+      [name]: {
+        columns: [],
+        description: description,
+      },
+    };
+
+    setBoards((prevBoards) => ({
+      ...prevBoards,
+      ...newBoard,
+    }));
+
+    setIsBoardModalOpen(false); // Close the modal after adding the board
   };
 
+  // 보드 수정
   const handleEditBoard = () => {
-    // 보드 수정 기능을 구현하세요
     alert('보드 수정 기능을 구현하세요');
   };
 
+  // 보드 삭제
   const handleDeleteBoard = () => {
-    // 보드 삭제 기능을 구현하세요
     alert('보드 삭제 기능을 구현하세요');
   };
 
+  // 보드 사용자 초대
   const handleInviteUser = () => {
-    // 사용자 초대 기능을 구현하세요
-    alert('사용자 초대 기능을 구현하세요');
   };
 
   const selectedColumns = boards[selectedBoard]?.columns || [];
@@ -104,8 +118,8 @@ function Board() {
     <div className={styles.board}>
       <span className={styles.boardIcons}>
       <span className={styles.boardText}>Board</span>
-          <MdAddCircleOutline onClick={handleAddBoard} className={styles.boardIcon} size={25} />
-          <MdEdit onClick={handleEditBoard} className={styles.boardIcon} size={25} />
+      <MdAddCircleOutline onClick={() => setIsBoardModalOpen(true)} className={styles.boardIcon} size={25} />
+      <MdEdit onClick={handleEditBoard} className={styles.boardIcon} size={25} />
           <FaTrashAlt onClick={handleDeleteBoard} className={styles.boardIcon} size={23} />
           <FaUserPlus onClick={handleInviteUser} className={styles.boardIcon} size={24} />
       </span>
@@ -141,6 +155,8 @@ function Board() {
         ))}
       </div>
       <ColumnModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAddColumn={handleAddColumn} />
+      <BoardModal isOpen={isBoardModalOpen} onClose={() => setIsBoardModalOpen(false)} onAddBoard={handleAddBoard} />
+
     </div>
   );
 }
