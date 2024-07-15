@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../styles/BoardModal.module.css';
+import styles from '../../styles/Board.module.css';
 
 function EditBoardModal({ isOpen, onClose, boardName, boardDescription, onSubmit, onNameChange, onDescriptionChange }) {
   const handleSubmit = (event) => {

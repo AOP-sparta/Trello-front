@@ -3,8 +3,9 @@ import { MdAddCircleOutline, MdEdit } from 'react-icons/md';
 import { FaTrashAlt, FaUserPlus } from 'react-icons/fa';
 import Column from './Column';
 import ColumnModal from './ColumnModal';
-import AddBoardModal from './AddBoardModal';
-import EditBoardModal from './EditBoardModal';
+import AddBoardModal from './BoardModal/AddBoardModal';
+import EditBoardModal from './BoardModal/EditBoardModal';
+import DeleteBoardModal from './BoardModal/DeleteBoardModal';
 import styles from '../styles/Board.module.css';
 
 function Board() {
@@ -33,6 +34,8 @@ function Board() {
   const [editBoardKey, setEditBoardKey] = useState('');
   const [editBoardName, setEditBoardName] = useState('');
   const [editBoardDescription, setEditBoardDescription] = useState('');
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // 삭제 모달 상태 추가
 
   const handleBoardChange = (event) => {
     setSelectedBoard(event.target.value);
@@ -77,6 +80,7 @@ function Board() {
     setIsColumnModalOpen(false);
   };
 
+  // 보드 추가
   const handleAddBoard = (boardName, boardDescription) => {
     const newBoardKey = boardName.trim();
     const newBoard = {
@@ -93,6 +97,7 @@ function Board() {
     setIsBoardModalOpen(false);
   };
 
+  // 보드 수정
   const handleEditBoard = () => {
     if (!selectedBoard) {
       alert('Please select a board first.');
@@ -127,8 +132,25 @@ function Board() {
     setIsEditModalOpen(false);
   };
 
+  // 보드 삭제
   const handleDeleteBoard = () => {
-    alert('보드 삭제 기능을 구현하세요');
+    if (!selectedBoard) {
+      alert('Please select a board first.');
+      return;
+    }
+
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteBoard = () => {
+    setBoards((prevBoards) => {
+      const updatedBoards = { ...prevBoards };
+      delete updatedBoards[selectedBoard];
+      return updatedBoards;
+    });
+
+    setSelectedBoard('');
+    setIsDeleteModalOpen(false);
   };
 
   const handleInviteUser = () => {
@@ -198,6 +220,11 @@ function Board() {
         onSubmit={handleSubmitEditBoard}
         onNameChange={setEditBoardName}
         onDescriptionChange={setEditBoardDescription}
+      />
+      <DeleteBoardModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onDelete={confirmDeleteBoard}
       />
     </div>
   );
