@@ -7,6 +7,7 @@ import { MdEdit, MdAddCircleOutline } from 'react-icons/md';
 import { FaTrashAlt } from 'react-icons/fa';
 import Comment from '../components/Comment';
 import CardEditModal from './CardEditModal';
+import DeleteModal from './DeleteModal';
 import axios from 'axios';
 
 function CardDetail() {
@@ -25,6 +26,8 @@ function CardDetail() {
     const location = useLocation();
     const { id } = location.state || {}; // 카드 id임
     const [isEditing, setIsEditing] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+
     const [titleValue, setTitle] = useState(title);
     const [contentValue, setContent] = useState(content);
     const [managerValue, setManager] = useState(manager);
@@ -46,6 +49,10 @@ function CardDetail() {
         setIsEditing(true);
     };
 
+    const handleDeleteClick = () => {
+        setIsDeleting(true);
+    };
+
     const handleCloseModal = () => {
         setIsEditing(false);
     };
@@ -57,6 +64,13 @@ function CardDetail() {
         setDeadline(deadlineValue);
         setIsEditing(false);
         alert(`카드 수정: ${titleValue}`);
+    };
+
+    const handleConfirmDelete = () => {
+        setIsDeleting(false);
+        // 카드 삭제 api
+
+        navigate('/board');
     };
 
     const handleSendClick = () => {
@@ -94,7 +108,10 @@ function CardDetail() {
                 <div className={styles.cardDetail}>
                     <div className={styles.cardHeader}>
                         <span className={styles.cardTitle}>{titleValue}</span>
-                        <MdEdit className={styles.editIcon} onClick={handleEditClick} />
+                        <div className={styles.icons}>
+                            <MdEdit className={styles.editIcon} onClick={handleEditClick} />
+                            <FaTrashAlt className={styles.deleteIcon} onClick={handleDeleteClick} />
+                        </div>
                     </div>
                     <div className={styles.cardBody}>
                         <div className={styles.cardInfo}>
@@ -107,12 +124,21 @@ function CardDetail() {
                     </div>
                     {isEditing && (
                         <CardEditModal
-                            title={title}
-                            content={content}
-                            manager={manager}
+                            title={titleValue}
+                            content={contentValue}
+                            manager={managerValue}
                             deadline={deadline}
                             onSave={handleSaveModal}
                             onClose={handleCloseModal}
+                        />
+                    )}
+                    {isDeleting && (
+                        <DeleteModal
+                            title={`"${titleValue}" 삭제`}
+                            content="정말로 삭제하시겠습니까?"
+                            onClose={handleCloseModal}
+                            onConfirm={handleConfirmDelete}
+                            confirmText="삭제"
                         />
                     )}
                 </div>

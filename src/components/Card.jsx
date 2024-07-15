@@ -5,11 +5,11 @@ import styles from '../styles/Card.module.css';
 
 function Card({ text, user, id, columnId }) {
   const navigate = useNavigate();
-  
-  const handleCardClick = () => {    
-    navigate('/card', { state: { id } });
+
+  const handleCardClick = () => {
+    navigate('/card', { state: { id} });
   };
-  
+
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'CARD',
     item: { id, columnId },
