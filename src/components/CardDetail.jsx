@@ -106,7 +106,6 @@ function CardDetail() {
             setManager(nickname);
             setDeadline(deadline);
             setCardDetails(response.data.result);
-            console.log(boardId, cardId);
         } catch (error) {
             console.error("카드 정보 가져오기 중 오류:", error);
         }
