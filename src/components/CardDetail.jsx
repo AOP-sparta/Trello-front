@@ -49,6 +49,7 @@ function CardDetail() {
 
     const handleCloseModal = () => {
         setIsEditing(false);
+        setIsDeleting(false);
     };
 
     const handleSaveModal = async ({ title, content, manager, deadline }) => {
@@ -79,11 +80,16 @@ function CardDetail() {
         }
     };
 
-    const handleConfirmDelete = () => {
+    const handleConfirmDelete = async () => {
         setIsDeleting(false);
-        // 카드 삭제 api
-
-        navigate('/board');
+        try {
+            await axiosInstance.delete(`/boards/${boardId}/cards/${id}`);
+            alert('카드가 삭제되었습니다.');
+            navigate('/board'); // 삭제 후 보드로 돌아가기
+        } catch (error) {
+            console.error("카드 삭제 중 오류:", error);
+            alert("카드 삭제에 실패했습니다.");
+        }
     };
 
     const handleSendClick = async () => {
