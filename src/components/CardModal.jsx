@@ -6,11 +6,28 @@ function CardModal({ onClose, onSave, boardId, id}) {
   const [title, setTitle] = useState(''); // 카드 제목 상태
   const [content, setContent] = useState('');
 
+  const getAccessToken = () => {
+    return localStorage.getItem('accessToken');
+  };
+
   const handleSave = async () => {
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+      alert('Access token is missing. Please log in.');
+      return;
+    }
+
+    console.log('Access Token:', accessToken);
+
     try {
       await axios.post(
           `http://localhost:8080/boards/${boardId}/status/${id}/cards`, // API 엔드포인트 URL
-          { title, content } // 수정된 부분: title과 content로 전달
+          { title : title, content : content },
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`
+            } // 수정된 부분: title과 content로 전달
+          }
       );
 
       // 카드 생성 성공 시, onSave를 통해 상태 업데이트

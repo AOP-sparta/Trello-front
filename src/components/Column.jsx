@@ -1,5 +1,5 @@
 // Column.js
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import { useDrop } from 'react-dnd';
 import { MdEdit, MdAddCircleOutline } from 'react-icons/md';
@@ -16,6 +16,10 @@ function Column({ id, title, cards, onDeleteColumn, onAddCard, onMoveCard, board
   const [isDeleting, setIsDeleting] = useState(false);
   const [columnTitle, setColumnTitle] = useState(title);
   const [isAddingCard, setIsAddingCard] = useState(false);
+
+  const getAccessToken = () => {
+    return localStorage.getItem('accessToken');
+  };
 
   const [{ isOver }, drop] = useDrop(() => ({
     accept: 'CARD',
@@ -61,18 +65,8 @@ function Column({ id, title, cards, onDeleteColumn, onAddCard, onMoveCard, board
   };
 
   const handleSaveCard = async (newCard) => {
-    try {
-      const response = await axios.post(
-          `http://localhost:8080/boards/${boardId}/status/${id}/cards`, // API 엔드포인트 URL
-          { text: newCard.text, user: newCard.user }
-      );
-
-      // 카드 생성 성공 시, onAddCard를 통해 상태 업데이트
-      onAddCard(id, { text: newCard.text, user: newCard.user });
-      setIsAddingCard(false);
-    } catch (error) {
-      console.error('Error creating card:', error);
-    }
+    onAddCard(id, { text: newCard.text, user: newCard.user });
+    setIsAddingCard(false);
   };
 
   return (
