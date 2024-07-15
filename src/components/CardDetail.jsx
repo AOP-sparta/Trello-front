@@ -73,10 +73,26 @@ function CardDetail() {
         navigate('/board');
     };
 
-    const handleSendClick = () => {
-        // 댓글 작성 api
+    const handleSendClick = async () => {
+        const commentContent = commentInput.current.value;
 
+        if (!commentContent) {
+            alert("댓글 내용을 입력하세요.");
+            return;
+        }
 
+        try {
+            await axiosInstance.post(`/cards/${id}/comments`, {
+                id,
+                content: commentContent,
+            });
+
+            fetchComments(id);
+            commentInput.current.value = ""; // 입력 필드 초기화
+        } catch (error) {
+            console.error("댓글 작성 중 오류:", error);
+            alert("댓글 작성에 실패했습니다.");
+        }
     };
 
     const handleBoardClick = () => {
