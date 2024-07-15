@@ -25,10 +25,7 @@ function Login() {
             });
 
             // Access 토큰을 localStorage에 저장
-            localStorage.setItem('accessToken', response.headers['Authorization']);
-
-            // Refresh 토큰을 Cookie에 저장하는 요청을 서버에 전송
-            document.cookie = `refreshToken=${response.data.refreshToken}; path=/; secure; HttpOnly; SameSite=Strict`;
+            localStorage.setItem('accessToken', response.data.result.access);
 
             navigate('/board');
         } catch (error) {
