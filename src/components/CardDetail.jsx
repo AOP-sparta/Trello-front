@@ -13,26 +13,20 @@ import axios from 'axios';
 function CardDetail() {
     const navigate = useNavigate();
 
-    // 창 켤 때 카드 id로 조회 합니다.
-    const boardTitle = "임시 보드 타이틀";
-    const boardIntro = "임시 보드 설명";
-
-    const title = "임시 타이틀";
-    const status = "임시 상태";
-    const content = "임시 콘텐츠";
-    const deadline = "임시 데드라인";
-    const manager = "임시 담당자";
-
     const location = useLocation();
-    const { id } = location.state || {}; // 카드 id임
+    const { id, boardId } = location.state || {}; // 카드 id 및 boardId 가져오기
     const [isEditing, setIsEditing] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
-    const [titleValue, setTitle] = useState(title);
-    const [contentValue, setContent] = useState(content);
-    const [managerValue, setManager] = useState(manager);
-    const [deadlineValue, setDeadline] = useState(deadline);
+    const [boardTitle, setBoardTitle] = useState([]);
+    const [boardIntro, setBoardIntro] = useState([]);
+    const [title, setTitle] = useState([]);
+    const [content, setContent] = useState([]);
+    const [manager, setManager] = useState([]);
+    const [deadline, setDeadline] = useState([]);
+    const [status, setStatus] = useState([]);
     const [comments, setComments] = useState([]);
+    const [cardDetails, setCardDetails] = useState({});
 
     const commentInput = useRef();
 
@@ -55,22 +49,47 @@ function CardDetail() {
 
     const handleCloseModal = () => {
         setIsEditing(false);
-    };
-
-    const handleSaveModal = ({ titleValue, contentValue, managerValue, deadlineValue }) => {
-        setTitle(titleValue);
-        setContent(contentValue);
-        setManager(managerValue);
-        setDeadline(deadlineValue);
-        setIsEditing(false);
-        alert(`카드 수정: ${titleValue}`);
-    };
-
-    const handleConfirmDelete = () => {
         setIsDeleting(false);
-        // 카드 삭제 api
+    };
 
-        navigate('/board');
+    const handleSaveModal = async ({ title, content, manager, deadline }) => {
+
+        if (!title || !content || !manager || !deadline) {
+            alert("모든 필드를 입력해주세요.");
+            return;
+        }
+
+        try {
+            await axiosInstance.patch(`/boards/${boardId}/cards/${id}`, {
+                title,
+                content,
+                nickname: manager,
+                deadline,
+            });
+
+            setTitle(title);
+            setContent(content);
+            setManager(manager);
+            setDeadline(deadline);
+            alert(`카드 수정 완료: ${title}`);
+        } catch (error) {
+            console.error("카드 수정 중 오류:", error);
+            alert("카드 수정에 실패했습니다.");
+        } finally {
+            setIsEditing(false);
+        }
+    };
+
+    const handleConfirmDelete = async () => {
+        setIsDeleting(false);
+        try {
+            await axiosInstance.delete(`/boards/${boardId}/cards/${id}`);
+            alert('카드가 삭제되었습니다.');
+            navigate('/board'); // 삭제 후 보드로 돌아가기
+        } catch (error) {
+            console.error("카드 삭제 중 오류:", error);
+            alert("카드 삭제에 실패했습니다.");
+        }
     };
 
     const handleSendClick = async () => {
@@ -99,9 +118,27 @@ function CardDetail() {
         navigate('/board');
     };
 
+    const fetchCardDetails = async (cardId, boardId) => {
+        try {
+            const response = await axiosInstance.get(`/boards/${boardId}/cards/${cardId}`);
+            const { title, statusTitle, content, nickname, deadline, boardTitle, boardIntro } = response.data.result;
+
+            setBoardTitle(boardTitle);
+            setBoardIntro(boardIntro);
+            setTitle(title);
+            setStatus(statusTitle);
+            setContent(content);
+            setManager(nickname);
+            setDeadline(deadline);
+            setCardDetails(response.data.result);
+        } catch (error) {
+            console.error("카드 정보 가져오기 중 오류:", error);
+        }
+    };
+
     const fetchComments = async (id) => {
         try {
-            const response = await axiosInstance.get(`/cards/${id}/comments`); 
+            const response = await axiosInstance.get(`/cards/${id}/comments`);
             setComments(response.data);
         } catch (error) {
             console.error("댓글 가져오기 중 오류:", error);
@@ -110,6 +147,7 @@ function CardDetail() {
 
     useEffect(() => {
         if (id) {
+            fetchCardDetails(id, boardId);
             fetchComments(id);
         }
     }, [id]);
@@ -123,7 +161,7 @@ function CardDetail() {
             <main className={styles.mainContent}>
                 <div className={styles.cardDetail}>
                     <div className={styles.cardHeader}>
-                        <span className={styles.cardTitle}>{titleValue}</span>
+                        <span className={styles.cardTitle}>{title}</span>
                         <div className={styles.icons}>
                             <MdEdit className={styles.editIcon} onClick={handleEditClick} />
                             <FaTrashAlt className={styles.deleteIcon} onClick={handleDeleteClick} />
@@ -131,18 +169,18 @@ function CardDetail() {
                     </div>
                     <div className={styles.cardBody}>
                         <div className={styles.cardInfo}>
-                            <p><strong>작업자</strong> {managerValue}</p>
+                            <p><strong>작업자</strong> {manager}</p>
                             <p><strong>상태</strong> {status}</p>
-                            <p><strong>마감 일자</strong> {deadlineValue}</p>
-                            <p><strong>내용</strong> {contentValue}</p>
+                            <p><strong>마감 일자</strong> {deadline}</p>
+                            <p><strong>내용</strong> {content}</p>
                         </div>
                         <button className={styles.backButton} onClick={handleBoardClick}>보드로 돌아가기</button>
                     </div>
                     {isEditing && (
                         <CardEditModal
-                            title={titleValue}
-                            content={contentValue}
-                            manager={managerValue}
+                            title={title}
+                            content={content}
+                            manager={manager}
                             deadline={deadline}
                             onSave={handleSaveModal}
                             onClose={handleCloseModal}
@@ -150,7 +188,7 @@ function CardDetail() {
                     )}
                     {isDeleting && (
                         <DeleteModal
-                            title={`"${titleValue}" 삭제`}
+                            title={`"${title}" 삭제`}
                             content="정말로 삭제하시겠습니까?"
                             onClose={handleCloseModal}
                             onConfirm={handleConfirmDelete}

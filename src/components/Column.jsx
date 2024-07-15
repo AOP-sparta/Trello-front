@@ -1,9 +1,9 @@
 // Column.js
-import React, {useEffect, useState} from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
-import {useDrop} from 'react-dnd';
-import {MdEdit, MdAddCircleOutline} from 'react-icons/md';
-import {FaTrashAlt} from 'react-icons/fa';
+import { useDrop } from 'react-dnd';
+import { MdEdit, MdAddCircleOutline } from 'react-icons/md';
+import { FaTrashAlt } from 'react-icons/fa';
 import Card from './Card';
 import styles from '../styles/Column.module.css';
 import EditModal from './EditModal';
@@ -39,31 +39,31 @@ function Column({id, title, cards, onDeleteColumn, onAddCard, onMoveCard, boardI
         setIsEditing(true);
     };
 
-    const handleDeleteClick = () => {
-        setIsDeleting(true);
-    };
+  const handleDeleteClick = () => {
+    setIsDeleting(true);
+  };
 
-    const handleAddCardClick = () => {
-        setIsAddingCard(true);
-    };
+  const handleAddCardClick = () => {
+    setIsAddingCard(true);
+  };
 
-    const handleCloseModal = () => {
-        setIsEditing(false);
-        setIsDeleting(false);
-        setIsAddingCard(false);
-    };
+  const handleCloseModal = () => {
+    setIsEditing(false);
+    setIsDeleting(false);
+    setIsAddingCard(false);
+  };
 
-    const handleSaveModal = (newTitle) => {
-        setColumnTitle(newTitle);
-        setIsEditing(false);
-        alert(`컬럼 수정: ${newTitle}`);
-    };
+  const handleSaveModal = (newTitle) => {
+    setColumnTitle(newTitle);
+    setIsEditing(false);
+    alert(`컬럼 수정: ${newTitle}`);
+  };
 
-    const handleConfirmDelete = () => {
-        setIsDeleting(false);
-        onDeleteColumn(id);
-        alert(`컬럼 삭제: ${columnTitle}`);
-    };
+  const handleConfirmDelete = () => {
+    setIsDeleting(false);
+    onDeleteColumn(id);
+    alert(`컬럼 삭제: ${columnTitle}`);
+  };
 
     const handleSaveCard = async (newCard) => {
         onAddCard(id, {text: newCard.text, user: newCard.user});

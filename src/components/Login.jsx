@@ -28,6 +28,7 @@ function Login() {
             localStorage.setItem('accessToken', response.data.result.access);
 
             navigate('/board');
+            window.location.reload();
         } catch (error) {
             alert(`${error.response.data.msg}`);
         }
