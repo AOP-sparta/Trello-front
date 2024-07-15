@@ -1,18 +1,31 @@
+// Column.js
 import React, { useState } from 'react';
-import { MdEdit } from "react-icons/md";
-import { FaTrashAlt } from "react-icons/fa";
-import { MdAddCircleOutline } from "react-icons/md";
+import { useDrop } from 'react-dnd';
+import { MdEdit, MdAddCircleOutline } from 'react-icons/md';
+import { FaTrashAlt } from 'react-icons/fa';
 import Card from './Card';
 import styles from '../styles/Column.module.css';
 import EditModal from './EditModal';
 import DeleteModal from './DeleteModal';
-import CardModal from './CardModal'; 
+import CardModal from './CardModal';
 
-function Column({ id, title, cards, onDeleteColumn, onAddCard }) {
+function Column({ id, title, cards, onDeleteColumn, onAddCard, onMoveCard }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [columnTitle, setColumnTitle] = useState(title);
-  const [isAddingCard, setIsAddingCard] = useState(false); // 수정: 초기값 false로 설정
+  const [isAddingCard, setIsAddingCard] = useState(false);
+
+  const [{ isOver }, drop] = useDrop(() => ({
+    accept: 'CARD',
+    drop: (item) => {
+      if (item.columnId !== id) {
+        onMoveCard(item.id, item.columnId, id);
+      }
+    },
+    collect: (monitor) => ({
+      isOver: !!monitor.isOver(),
+    }),
+  }));
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -50,7 +63,7 @@ function Column({ id, title, cards, onDeleteColumn, onAddCard }) {
   };
 
   return (
-    <div className={styles.column}>
+    <div ref={drop} className={styles.column} style={{ backgroundColor: isOver ? '#e0e0e0' : '#fff' }}>
       <div>
         <div className={styles.columnHeader}>
           <h2>{columnTitle}</h2>
@@ -76,14 +89,14 @@ function Column({ id, title, cards, onDeleteColumn, onAddCard }) {
             confirmText="삭제"
           />
         )}
-        {isAddingCard && ( 
+        {isAddingCard && (
           <CardModal
             onClose={handleCloseModal}
             onSave={handleSaveCard}
           />
         )}
         {cards.map((card, index) => (
-          <Card key={index} text={card.text} user={card.user} />
+          <Card key={index} id={card.id} columnId={id} text={card.text} user={card.user} />
         ))}
       </div>
       <div className={styles.addCardIcon} onClick={handleAddCardClick}>
