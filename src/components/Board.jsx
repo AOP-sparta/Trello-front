@@ -6,6 +6,7 @@ import ColumnModal from './ColumnModal';
 import AddBoardModal from './BoardModal/AddBoardModal';
 import EditBoardModal from './BoardModal/EditBoardModal';
 import DeleteBoardModal from './BoardModal/DeleteBoardModal';
+import InviteUserModal from './BoardModal/InviteUserModal';
 import styles from '../styles/Board.module.css';
 
 function Board() {
@@ -29,13 +30,12 @@ function Board() {
 
   const [isColumnModalOpen, setIsColumnModalOpen] = useState(false);
   const [isBoardModalOpen, setIsBoardModalOpen] = useState(false);
-
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editBoardKey, setEditBoardKey] = useState('');
   const [editBoardName, setEditBoardName] = useState('');
   const [editBoardDescription, setEditBoardDescription] = useState('');
-
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // 삭제 모달 상태 추가
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); 
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false); 
 
   const handleBoardChange = (event) => {
     setSelectedBoard(event.target.value);
@@ -154,7 +154,13 @@ function Board() {
   };
 
   const handleInviteUser = () => {
-    alert('사용자 초대 기능을 구현하세요');
+    setIsInviteModalOpen(true);
+  };
+
+  const sendInvitation = (email) => {
+    // 여기에 실제로 초대 메일을 보내는 로직 추가
+    console.log(`Inviting user with email: ${email}`);
+    setIsInviteModalOpen(false);
   };
 
   const selectedColumns = boards[selectedBoard]?.columns || [];
@@ -226,6 +232,9 @@ function Board() {
         onClose={() => setIsDeleteModalOpen(false)}
         onDelete={confirmDeleteBoard}
       />
+      <InviteUserModal isOpen={isInviteModalOpen} 
+      onClose={() => setIsInviteModalOpen(false)} 
+      onInvite={sendInvitation} />
     </div>
   );
 }
