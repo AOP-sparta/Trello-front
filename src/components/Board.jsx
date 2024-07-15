@@ -81,21 +81,34 @@ function Board() {
     setIsColumnModalOpen(false);
   };
 
+  const getAccessToken = () => {
+    return localStorage.getItem('accessToken');
+  };
+
   // 보드 추가
   const handleAddBoard = async (boardName, boardDescription) => {
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+      alert('Access token is missing. Please log in.');
+      return;
+    }
+
+    console.log('Access Token:', accessToken);
+
     try {
       const response = await axios.post('http://localhost:8080/boards', {
-        board_name: boardName,
+        boardName: boardName,
         introduction: boardDescription,
       }, {
         headers: {
-          authorization: 'Bearer <token>', // 실제 토큰으로 교체해야 함
+          authorization: `Bearer ${accessToken}`,
         },
       });
 
+
       if (response.status === 201) {
         const newBoard = response.data.result;
-        const newBoardKey = newBoard.board_name.trim();
+        const newBoardKey = newBoard.boardName.trim();
 
         setBoards((prevBoards) => ({
           ...prevBoards,
@@ -107,12 +120,19 @@ function Board() {
 
         setSelectedBoard(newBoardKey);
         setIsBoardModalOpen(false);
+
+        console.log('보드 생성 응답 데이터:', response.data); // 응답 데이터만 출력
       } else {
         alert('보드 생성 실패');
       }
     } catch (error) {
       console.error('보드 생성 오류:', error);
-      alert('보드 생성 중 오류가 발생했습니다.');
+      if (error.response && error.response.status === 403) {
+        console.log('Full error response:', error.response);
+        alert('권한이 없습니다.');
+      } else {
+        alert('보드 생성 중 오류가 발생했습니다.');
+      }
     }
   };
 
