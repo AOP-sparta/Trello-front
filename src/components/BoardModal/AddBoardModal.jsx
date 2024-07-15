@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from '../styles/BoardModal.module.css';
+import styles from '../../styles/BoardModal.module.css';
 
 function AddBoardModal({ isOpen, onClose, onAddBoard }) {
   const [boardName, setBoardName] = useState('');
