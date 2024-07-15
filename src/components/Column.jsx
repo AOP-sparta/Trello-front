@@ -105,7 +105,7 @@ function Column({ id, title, cards, onDeleteColumn, onAddCard, onMoveCard, board
           />
         )}
         {cards.map((card, index) => (
-          <Card key={index} id={card.id} columnId={id} text={card.text} user={card.user}/>
+          <Card key={index} id={card.id} columnId={id} text={card.text} user={card.user} boardId={boardId}/>
         ))}
       </div>
       <div className={styles.addCardIcon} onClick={handleAddCardClick}>
