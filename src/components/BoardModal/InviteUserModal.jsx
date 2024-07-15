@@ -8,8 +8,8 @@ function InviteUserModal({ isOpen, onClose, onInvite }) {
     event.preventDefault();
     onInvite(email);
     setEmail('');
-    onClose(); // 초대 성공 후 모달 닫기
-    alert(`${email}로 초대 메일을 성공적으로 보냈습니다.`);
+    onClose(); // 모달 닫기
+    alert(`${email} 초대를 완료했습니다.`);
   };
 
   return (
