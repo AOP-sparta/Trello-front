@@ -12,22 +12,27 @@ import styles from '../styles/Board.module.css';
 
 function Board() {
   const [selectedBoard, setSelectedBoard] = useState('');
-  const [boards, setBoards] = useState({
-    '보드 1': {
+  const [boards, setBoards] = useState([
+    {
+      id: 1,
+      title: '보드 1',
       columns: [
         { id: 1, title: '🗒️ To Do', cards: [{ id: 1, text: 'Task 1', user: 'OOO 님' }, { id: 2, text: 'Task 2', user: 'OOO 님' }] },
         { id: 2, title: '💻 In Progress', cards: [{ id: 3, text: 'Task 3', user: 'OOO 님' }, { id: 4, text: 'Task 4', user: 'OOO 님' }] },
         { id: 3, title: '🚀 Done', cards: [{ id: 5, text: 'Task 5', user: 'OOO 님' }, { id: 6, text: 'Task 6', user: 'OOO 님' }] },
       ],
     },
-    '보드 2': {
+    {
+      id: 2,
+      title: '보드 2',
       columns: [
         { id: 4, title: '🗒️ To Do', cards: [{ id: 7, text: 'Task A', user: 'OOO 님' }, { id: 8, text: 'Task B', user: 'OOO 님' }] },
         { id: 5, title: '💻 In Progress', cards: [{ id: 9, text: 'Task C', user: 'OOO 님' }, { id: 10, text: 'Task D', user: 'OOO 님' }] },
         { id: 6, title: '🚀 Done', cards: [{ id: 11, text: 'Task E', user: 'OOO 님' }, { id: 12, text: 'Task F', user: 'OOO 님' }] },
       ],
     },
-  });
+  ]);
+
 
   const [isColumnModalOpen, setIsColumnModalOpen] = useState(false);
   const [isBoardModalOpen, setIsBoardModalOpen] = useState(false);
@@ -264,6 +269,7 @@ function Board() {
                 id={column.id}
                 title={column.title}
                 cards={column.cards}
+                boardId={selectedBoard}
                 onDeleteColumn={handleDeleteColumn}
                 onAddCard={handleAddCard}
                 onMoveCard={handleMoveCard}

@@ -1,5 +1,6 @@
 // Column.js
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
+import axios from 'axios';
 import { useDrop } from 'react-dnd';
 import { MdEdit, MdAddCircleOutline } from 'react-icons/md';
 import { FaTrashAlt } from 'react-icons/fa';
@@ -8,12 +9,17 @@ import styles from '../styles/Column.module.css';
 import EditModal from './EditModal';
 import DeleteModal from './DeleteModal';
 import CardModal from './CardModal';
+import board from "./Board";
 
-function Column({ id, title, cards, onDeleteColumn, onAddCard, onMoveCard }) {
+function Column({ id, title, cards, onDeleteColumn, onAddCard, onMoveCard, boardId }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [columnTitle, setColumnTitle] = useState(title);
   const [isAddingCard, setIsAddingCard] = useState(false);
+
+  const getAccessToken = () => {
+    return localStorage.getItem('accessToken');
+  };
 
   const [{ isOver }, drop] = useDrop(() => ({
     accept: 'CARD',
@@ -26,6 +32,7 @@ function Column({ id, title, cards, onDeleteColumn, onAddCard, onMoveCard }) {
       isOver: !!monitor.isOver(),
     }),
   }));
+
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -57,8 +64,8 @@ function Column({ id, title, cards, onDeleteColumn, onAddCard, onMoveCard }) {
     alert(`컬럼 삭제: ${columnTitle}`);
   };
 
-  const handleSaveCard = (newCard) => {
-    onAddCard(id, newCard);
+  const handleSaveCard = async (newCard) => {
+    onAddCard(id, { text: newCard.text, user: newCard.user });
     setIsAddingCard(false);
   };
 
@@ -93,10 +100,12 @@ function Column({ id, title, cards, onDeleteColumn, onAddCard, onMoveCard }) {
           <CardModal
             onClose={handleCloseModal}
             onSave={handleSaveCard}
+            boardId={boardId}
+            id={id}
           />
         )}
         {cards.map((card, index) => (
-          <Card key={index} id={card.id} columnId={id} text={card.text} user={card.user} />
+          <Card key={index} id={card.id} columnId={id} text={card.text} user={card.user}/>
         ))}
       </div>
       <div className={styles.addCardIcon} onClick={handleAddCardClick}>
