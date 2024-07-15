@@ -66,59 +66,52 @@
     right: 10px;
 }
 
+
+
 .commentsSection {
     flex: 1;
     border: 1px solid #ccc;
     border-radius: 5px;
     padding: 20px;
-}
-
-.commentsSection h3 {
-    margin: 0 0 10px 0;
+    max-height: 400px; /* 최대 높이 설정 */
+    overflow-y: auto; /* 스크롤 가능 */
 }
 
 .comment {
     background-color: #f4f4f4;
     padding: 15px;
     margin: 5px 0;
-    margin-bottom: 15px;
     border-radius: 20px;
     text-align: left;
+    max-width: 100%; /* 최대 너비 설정 */
+    word-wrap: break-word; /* 단어가 길면 줄바꿈 */
 }
 
-/* Adjusting the container for the input and icon */
-.commentInputContainer {
-    position: relative;
-    display: flex;
-    align-items: center;
-    margin-top: 100px; /* Adjust as necessary */
-}
-
-/* Styling the input field */
+/* 댓글 입력 필드 */
 .commentInput {
     flex: 1;
+    max-width: 300px; /* 최대 너비 설정 */
     padding: 15px;
-    padding-right: 40px; /* Space for the icon */
+    padding-right: 40px; /* 아이콘 공간 */
     border: 1px solid #ccc;
     border-radius: 20px;
     outline: none;
     font-size: 14px;
+    resize: none; /* 크기 조정 방지 */
+    white-space: pre-wrap; /* 줄바꿈 허용 */
 }
 
-/* Positioning the icon inside the input field */
+.commentInputContainer {
+    display: flex;
+    align-items: center;
+    margin-top: 20px; /* 적절하게 조정 */
+}
+
+/* 버튼 아이콘 스타일 */
 .sendIcon {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
+    margin-left: 10px; /* 입력 필드와의 간격 */
     font-size: 24px;
     cursor: pointer;
     color: gray;
-    background: none;
-    border: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
+
