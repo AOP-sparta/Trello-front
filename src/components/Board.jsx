@@ -1,3 +1,4 @@
+// Board.js
 import React, { useState } from 'react';
 import { MdAddCircleOutline, MdEdit } from 'react-icons/md';
 import { FaTrashAlt, FaUserPlus } from 'react-icons/fa';
@@ -14,16 +15,16 @@ function Board() {
   const [boards, setBoards] = useState({
     '보드 1': {
       columns: [
-        { id: 1, title: '🗒️ To Do', cards: [{ text: 'Task 1', user: 'OOO 님' }, { text: 'Task 2', user: 'OOO 님' }] },
-        { id: 2, title: '💻 In Progress', cards: [{ text: 'Task 3', user: 'OOO 님' }, { text: 'Task 4', user: 'OOO 님' }] },
-        { id: 3, title: '🚀 Done', cards: [{ text: 'Task 5', user: 'OOO 님' }, { text: 'Task 6', user: 'OOO 님' }] },
+        { id: 1, title: '🗒️ To Do', cards: [{ id: 1, text: 'Task 1', user: 'OOO 님' }, { id: 2, text: 'Task 2', user: 'OOO 님' }] },
+        { id: 2, title: '💻 In Progress', cards: [{ id: 3, text: 'Task 3', user: 'OOO 님' }, { id: 4, text: 'Task 4', user: 'OOO 님' }] },
+        { id: 3, title: '🚀 Done', cards: [{ id: 5, text: 'Task 5', user: 'OOO 님' }, { id: 6, text: 'Task 6', user: 'OOO 님' }] },
       ],
     },
     '보드 2': {
       columns: [
-        { id: 4, title: '🗒️ To Do', cards: [{ text: 'Task A', user: 'OOO 님' }, { text: 'Task B', user: 'OOO 님' }] },
-        { id: 5, title: '💻 In Progress', cards: [{ text: 'Task C', user: 'OOO 님' }, { text: 'Task D', user: 'OOO 님' }] },
-        { id: 6, title: '🚀 Done', cards: [{ text: 'Task E', user: 'OOO 님' }, { text: 'Task F', user: 'OOO 님' }] },
+        { id: 4, title: '🗒️ To Do', cards: [{ id: 7, text: 'Task A', user: 'OOO 님' }, { id: 8, text: 'Task B', user: 'OOO 님' }] },
+        { id: 5, title: '💻 In Progress', cards: [{ id: 9, text: 'Task C', user: 'OOO 님' }, { id: 10, text: 'Task D', user: 'OOO 님' }] },
+        { id: 6, title: '🚀 Done', cards: [{ id: 11, text: 'Task E', user: 'OOO 님' }, { id: 12, text: 'Task F', user: 'OOO 님' }] },
       ],
     },
   });
@@ -163,6 +164,22 @@ function Board() {
     setIsInviteModalOpen(false);
   };
 
+  const handleMoveCard = (cardId, fromColumnId, toColumnId) => {
+    setBoards((prevBoards) => {
+      const updatedBoards = { ...prevBoards };
+      const fromColumnIndex = updatedBoards[selectedBoard].columns.findIndex((column) => column.id === fromColumnId);
+      const toColumnIndex = updatedBoards[selectedBoard].columns.findIndex((column) => column.id === toColumnId);
+
+      if (fromColumnIndex !== -1 && toColumnIndex !== -1) {
+        const cardIndex = updatedBoards[selectedBoard].columns[fromColumnIndex].cards.findIndex((card) => card.id === cardId);
+        const [movedCard] = updatedBoards[selectedBoard].columns[fromColumnIndex].cards.splice(cardIndex, 1);
+        updatedBoards[selectedBoard].columns[toColumnIndex].cards.push(movedCard);
+      }
+
+      return updatedBoards;
+    });
+  };
+
   const selectedColumns = boards[selectedBoard]?.columns || [];
 
   const chunkColumns = (columns, chunkSize) => {
@@ -211,6 +228,7 @@ function Board() {
                 cards={column.cards}
                 onDeleteColumn={handleDeleteColumn}
                 onAddCard={handleAddCard}
+                onMoveCard={handleMoveCard}
               />
             ))}
           </div>
