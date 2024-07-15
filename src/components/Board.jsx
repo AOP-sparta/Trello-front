@@ -11,6 +11,8 @@ import InviteUserModal from './BoardModal/InviteUserModal';
 import styles from '../styles/Board.module.css';
 function Board() {
   const [selectedBoard, setSelectedBoard] = useState('');
+  const [selectedBoardData, setSelectedBoardData] = useState('');
+  const [boardId, setBoardId] = useState('');
   const [boards, setBoards] = useState({});
   const [statuses, setStatuses] = useState([]);
   const [isColumnModalOpen, setIsColumnModalOpen] = useState(false);
@@ -50,7 +52,7 @@ function Board() {
 
       try {
         const token = localStorage.getItem('accessToken');
-        const response = await axios.get(`http://localhost:8080/boards/${selectedBoard}/status`, {
+        const response = await axios.get(`http://localhost:8080/boards/${boardId}/status`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setStatuses(response.data.result);
@@ -65,7 +67,11 @@ function Board() {
   }, [selectedBoard]);
 
   const handleBoardChange = (event) => {
-    setSelectedBoard(event.target.value);
+    const selectedId = event.target.value;
+    setBoardId(selectedId);
+    const selectedBoardData = boards[selectedId];
+    setSelectedBoardData(selectedBoardData);
+    setSelectedBoard(selectedBoardData.boardName); // 보드의 제목으로 설정
   };
   const handleDeleteColumn = (columnId) => {
     setBoards((prevBoards) => {
@@ -154,9 +160,9 @@ function Board() {
       alert('Please select a board first.');
       return;
     }
-    setEditBoardKey(selectedBoard);
+    setEditBoardKey(boardId);
     setEditBoardName(selectedBoard);
-    setEditBoardDescription(boards[selectedBoard]?.description || '');
+    setEditBoardDescription(selectedBoardData.introduction || '');
     setIsEditModalOpen(true);
   };
   const handleSubmitEditBoard = async () => {
@@ -169,7 +175,6 @@ function Board() {
       alert('Access token is missing. Please log in.');
       return;
     }
-    const boardId = boards[selectedBoard].id;
     const url = `http://localhost:8080/boards/${boardId}`;
     console.log('Access Token:', accessToken);
     console.log('PUT URL:', url);
@@ -197,6 +202,7 @@ function Board() {
         setSelectedBoard(editBoardName);
         setIsEditModalOpen(false);
         console.log('보드 수정 응답 데이터:', response.data);
+        
       } else {
         alert('보드 수정 실패');
       }
@@ -309,13 +315,13 @@ function Board() {
       </span>
       <div className={styles.boardHeader}>
         <h1>{selectedBoard || '보드 이름'}</h1>
-        <p>{boards[selectedBoard]?.description || '보드 한 줄 설명'}</p>
+        <p>{boards[boardId]?.introduction || '보드 한 줄 설명'}</p>
       </div>
       <div className={styles.selectBoard}>
-        <select id="board-select" value={selectedBoard} onChange={handleBoardChange}>
+        <select id="board-select" value={boardId} onChange={handleBoardChange}>
           <option value="" disabled>보드 선택</option>
           {Object.entries(boards).map(([boardKey, boardData]) => (
-            <option key={boardKey} value={boardKey}>{boardData.boardName}</option> // boardName으로 수정
+            <option key={boardKey} value={boardData.id}>{boardData.boardName}</option> // ID를 값으로 사용
           ))}
         </select>
         <div className={styles.addColumnButton} onClick={() => setIsColumnModalOpen(true)}>
