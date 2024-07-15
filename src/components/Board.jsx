@@ -12,27 +12,22 @@ import styles from '../styles/Board.module.css';
 
 function Board() {
   const [selectedBoard, setSelectedBoard] = useState('');
-  const [boards, setBoards] = useState([
-    {
-      id: 1,
-      title: '보드 1',
+  const [boards, setBoards] = useState({
+    '보드 1': {
       columns: [
         { id: 1, title: '🗒️ To Do', cards: [{ id: 1, text: 'Task 1', user: 'OOO 님' }, { id: 2, text: 'Task 2', user: 'OOO 님' }] },
         { id: 2, title: '💻 In Progress', cards: [{ id: 3, text: 'Task 3', user: 'OOO 님' }, { id: 4, text: 'Task 4', user: 'OOO 님' }] },
         { id: 3, title: '🚀 Done', cards: [{ id: 5, text: 'Task 5', user: 'OOO 님' }, { id: 6, text: 'Task 6', user: 'OOO 님' }] },
       ],
     },
-    {
-      id: 2,
-      title: '보드 2',
+    '보드 2': {
       columns: [
         { id: 4, title: '🗒️ To Do', cards: [{ id: 7, text: 'Task A', user: 'OOO 님' }, { id: 8, text: 'Task B', user: 'OOO 님' }] },
         { id: 5, title: '💻 In Progress', cards: [{ id: 9, text: 'Task C', user: 'OOO 님' }, { id: 10, text: 'Task D', user: 'OOO 님' }] },
         { id: 6, title: '🚀 Done', cards: [{ id: 11, text: 'Task E', user: 'OOO 님' }, { id: 12, text: 'Task F', user: 'OOO 님' }] },
       ],
     },
-  ]);
-
+  });
 
   const [isColumnModalOpen, setIsColumnModalOpen] = useState(false);
   const [isBoardModalOpen, setIsBoardModalOpen] = useState(false);
@@ -118,6 +113,7 @@ function Board() {
         setBoards((prevBoards) => ({
           ...prevBoards,
           [newBoardKey]: {
+            id: newBoard.id,
             columns: [],
             description: newBoard.introduction,
           },
@@ -147,56 +143,136 @@ function Board() {
       alert('Please select a board first.');
       return;
     }
-
+  
     setEditBoardKey(selectedBoard);
     setEditBoardName(selectedBoard);
     setEditBoardDescription(boards[selectedBoard]?.description || '');
-
+  
     setIsEditModalOpen(true);
   };
-
-  const handleSubmitEditBoard = () => {
+  
+   const handleSubmitEditBoard = async () => {
     if (!editBoardKey || !editBoardName || !editBoardDescription) {
       alert('Please fill in all fields.');
       return;
     }
-
-    setBoards((prevBoards) => {
-      const updatedBoards = { ...prevBoards };
-      const updatedBoard = {
-        columns: updatedBoards[selectedBoard]?.columns || [],
-        description: editBoardDescription,
-      };
-      delete updatedBoards[selectedBoard];
-      updatedBoards[editBoardName] = updatedBoard;
-      return updatedBoards;
-    });
-
-    setSelectedBoard(editBoardName);
-    setIsEditModalOpen(false);
-  };
-
-  // 보드 삭제
-  const handleDeleteBoard = () => {
-    if (!selectedBoard) {
-      alert('Please select a board first.');
+    
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+      alert('Access token is missing. Please log in.');
       return;
     }
-
-    setIsDeleteModalOpen(true);
+  
+    const boardId = boards[selectedBoard].id;
+    const url = `http://localhost:8080/boards/${boardId}`;
+    
+    console.log('Access Token:', accessToken);
+    console.log('PUT URL:', url);
+  
+    try {
+      const response = await axios.put(url, {
+        boardName: editBoardName,
+        introduction: editBoardDescription,
+      }, {
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+  
+      if (response.status === 200) {
+        setBoards((prevBoards) => {
+          const updatedBoards = { ...prevBoards };
+          const updatedBoard = {
+            id: boardId,
+            columns: updatedBoards[selectedBoard]?.columns || [],
+            description: editBoardDescription,
+          };
+          delete updatedBoards[selectedBoard];
+          updatedBoards[editBoardName] = updatedBoard;
+          return updatedBoards;
+        });
+  
+        setSelectedBoard(editBoardName);
+        setIsEditModalOpen(false);
+        console.log('보드 수정 응답 데이터:', response.data);
+      } else {
+        alert('보드 수정 실패');
+      }
+    } catch (error) {
+      console.error('보드 수정 오류:', error);
+      if (error.response) {
+        console.log('Full error response:', error.response);
+        if (error.response.status === 401) {
+          alert('인증 오류: 유효하지 않은 토큰입니다. 다시 로그인하세요.');
+        } else if (error.response.status === 400) {
+          alert('잘못된 요청입니다.');
+        } else {
+          alert('보드 수정 중 오류가 발생했습니다.');
+        }
+      } else {
+        alert('서버와 통신하는 중 오류가 발생했습니다.');
+      }
+    }
   };
+  
+  // 보드 삭제
+const handleDeleteBoard = () => {
+  if (!selectedBoard) {
+    alert('Please select a board first.');
+    return;
+  }
 
-  const confirmDeleteBoard = () => {
-    setBoards((prevBoards) => {
-      const updatedBoards = { ...prevBoards };
-      delete updatedBoards[selectedBoard];
-      return updatedBoards;
+  setIsDeleteModalOpen(true);
+};
+
+const confirmDeleteBoard = async () => {
+  const accessToken = getAccessToken();
+  if (!accessToken) {
+    alert('Access token is missing. Please log in.');
+    return;
+  }
+
+  const selectedBoardData = boards[selectedBoard];
+  if (!selectedBoardData || !selectedBoardData.id) {
+    alert('Selected board does not have a valid ID.');
+    return;
+  }
+
+  const boardId = selectedBoardData.id;
+  const url = `http://localhost:8080/boards/${boardId}`;
+
+  try {
+    const response = await axios.delete(url, {
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+      },
     });
 
-    setSelectedBoard('');
-    setIsDeleteModalOpen(false);
-  };
+    if (response.status === 200) {
+      const updatedBoards = { ...boards };
+      delete updatedBoards[selectedBoard];
+      setBoards(updatedBoards);
+      setSelectedBoard('');
+      setIsDeleteModalOpen(false);
 
+      console.log('보드 삭제 응답 데이터:', response.data); // 응답 데이터 출력
+
+      alert('보드 삭제 성공');
+    } else {
+      alert('보드 삭제 실패');
+    }
+  } catch (error) {
+    console.error('보드 삭제 오류:', error);
+    if (error.response && error.response.status === 403) {
+      console.log('Full error response:', error.response);
+      alert('권한이 없습니다.');
+    } else {
+      alert('보드 삭제 중 오류가 발생했습니다.');
+    }
+  }
+};
+
+  // 사용자 초대
   const handleInviteUser = () => {
     setIsInviteModalOpen(true);
   };
@@ -269,7 +345,6 @@ function Board() {
                 id={column.id}
                 title={column.title}
                 cards={column.cards}
-                boardId={selectedBoard}
                 onDeleteColumn={handleDeleteColumn}
                 onAddCard={handleAddCard}
                 onMoveCard={handleMoveCard}
