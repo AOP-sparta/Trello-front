@@ -3,16 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { useDrag } from 'react-dnd';
 import styles from '../styles/Card.module.css';
 
-function Card({ text, user, id, columnId }) {
+
+function Card({ text, user, id, columnId, boardId }) {
   const navigate = useNavigate();
-  
+
   const handleCardClick = () => {
-    const boardTitle = "임시보드제목";
-    const boardExplain = "임시보드설명";
-    
-    navigate('/card', { state: { boardTitle, boardExplain } });
+    navigate('/card', { state: { id, boardId } });
   };
-  
+
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'CARD',
     item: { id, columnId },

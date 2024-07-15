@@ -9,7 +9,7 @@ import EditModal from './EditModal';
 import DeleteModal from './DeleteModal';
 import CardModal from './CardModal';
 
-function Column({ id, title, cards, onDeleteColumn, onAddCard, onMoveCard }) {
+function Column({ id, title, cards =[], onDeleteColumn, onAddCard, onMoveCard }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [columnTitle, setColumnTitle] = useState(title);
@@ -63,47 +63,47 @@ function Column({ id, title, cards, onDeleteColumn, onAddCard, onMoveCard }) {
   };
 
   return (
-    <div ref={drop} className={styles.column} style={{ backgroundColor: isOver ? '#e0e0e0' : '#fff' }}>
-      <div>
-        <div className={styles.columnHeader}>
-          <h2>{columnTitle}</h2>
-          <div className={styles.columnIcons}>
-            <MdEdit className={styles.editIcon} onClick={handleEditClick} />
-            <FaTrashAlt className={styles.deleteIcon} onClick={handleDeleteClick} />
+      <div ref={drop} className={styles.column} style={{ backgroundColor: isOver ? '#e0e0e0' : '#fff' }}>
+        <div>
+          <div className={styles.columnHeader}>
+            <h2>{columnTitle}</h2>
+            <div className={styles.columnIcons}>
+              <MdEdit className={styles.editIcon} onClick={handleEditClick} />
+              <FaTrashAlt className={styles.deleteIcon} onClick={handleDeleteClick} />
+            </div>
           </div>
+          {isEditing && (
+              <EditModal
+                  title="컬럼 수정"
+                  initialValue={columnTitle}
+                  onSave={handleSaveModal}
+                  onClose={handleCloseModal}
+              />
+          )}
+          {isDeleting && (
+              <DeleteModal
+                  title={`"${columnTitle}" 삭제`}
+                  content="정말로 삭제하시겠습니까?"
+                  onClose={handleCloseModal}
+                  onConfirm={handleConfirmDelete}
+                  confirmText="삭제"
+              />
+          )}
+          {isAddingCard && (
+              <CardModal
+                  onClose={handleCloseModal}
+                  onSave={handleSaveCard}
+              />
+          )}
+          {cards.map((card, index) => (
+              <Card key={index} id={card.id} columnId={id} text={card.text} user={card.user} />
+          ))}
         </div>
-        {isEditing && (
-          <EditModal
-            title="컬럼 수정"
-            initialValue={columnTitle}
-            onSave={handleSaveModal}
-            onClose={handleCloseModal}
-          />
-        )}
-        {isDeleting && (
-          <DeleteModal
-            title={`"${columnTitle}" 삭제`}
-            content="정말로 삭제하시겠습니까?"
-            onClose={handleCloseModal}
-            onConfirm={handleConfirmDelete}
-            confirmText="삭제"
-          />
-        )}
-        {isAddingCard && (
-          <CardModal
-            onClose={handleCloseModal}
-            onSave={handleSaveCard}
-          />
-        )}
-        {cards.map((card, index) => (
-          <Card key={index} id={card.id} columnId={id} text={card.text} user={card.user} />
-        ))}
+        <div className={styles.addCardIcon} onClick={handleAddCardClick}>
+          <MdAddCircleOutline size={24} />
+          <div>Add card</div>
+        </div>
       </div>
-      <div className={styles.addCardIcon} onClick={handleAddCardClick}>
-        <MdAddCircleOutline size={24} />
-        <div>Add card</div>
-      </div>
-    </div>
   );
 }
 
