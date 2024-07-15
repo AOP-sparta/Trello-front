@@ -1,13 +1,24 @@
 import React, { useState } from 'react';
 import styles from '../styles/Modal.module.css';
+import axios from 'axios';
 
-function CardModal({ onClose, onSave }) {
-  const [text, setText] = useState('');
-  const [user, setUser] = useState('');
+function CardModal({ onClose, onSave, boardId, id}) {
+  const [title, setTitle] = useState(''); // 카드 제목 상태
+  const [content, setContent] = useState('');
 
-  const handleSave = () => {
-    onSave({ text, user });
-    onClose();
+  const handleSave = async () => {
+    try {
+      await axios.post(
+          `http://localhost:8080/boards/${boardId}/status/${id}/cards`, // API 엔드포인트 URL
+          { title, content } // 수정된 부분: title과 content로 전달
+      );
+
+      // 카드 생성 성공 시, onSave를 통해 상태 업데이트
+      onSave({ title, content }); // 수정된 부분: title과 content를 전달
+      onClose(); // 모달 닫기
+    } catch (error) {
+      console.error('Error creating card:', error);
+    }
   };
 
   return (
@@ -15,21 +26,21 @@ function CardModal({ onClose, onSave }) {
       <div className={styles.modal}>
         <h2>카드 추가</h2>
         <div className={styles.inputGroup}>
-          <label htmlFor="cardText">내용</label>
+          <label htmlFor="cardText">제목</label>
           <input
-            id="cardText"
+            id="cardTitle"
             type="text"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           />
         </div>
         <div className={styles.inputGroup}>
-          <label htmlFor="cardUser">사용자</label>
+          <label htmlFor="cardUser">내용</label>
           <input
-            id="cardUser"
+            id="cardContent"
             type="text"
-            value={user}
-            onChange={(e) => setUser(e.target.value)}
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
           />
         </div>
         <div className={styles.modalButtons}>
