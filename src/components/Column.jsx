@@ -1,5 +1,5 @@
 // Column.js
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import { useDrop } from 'react-dnd';
 import { MdEdit, MdAddCircleOutline } from 'react-icons/md';
