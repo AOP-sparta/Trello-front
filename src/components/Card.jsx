@@ -6,11 +6,8 @@ import styles from '../styles/Card.module.css';
 function Card({ text, user, id, columnId }) {
   const navigate = useNavigate();
   
-  const handleCardClick = () => {
-    const boardTitle = "임시보드제목";
-    const boardExplain = "임시보드설명";
-    
-    navigate('/card', { state: { boardTitle, boardExplain } });
+  const handleCardClick = () => {    
+    navigate('/card', { state: { id } });
   };
   
   const [{ isDragging }, drag] = useDrag(() => ({

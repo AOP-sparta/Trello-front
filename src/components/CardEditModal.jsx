@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import styles from '../styles/Modal.module.css';
 
-function CardEditModal({ title, content, manager, deadline, onClose, onSave }) {
+function CardEditModal({ title, content, manager, deadline, onSave, onClose }) {
   const [titleValue, setTitle] = useState(title);
   const [contentValue, setContent] = useState(content);
   const [managerValue, setManager] = useState(manager);
   const [deadlineValue, setDeadline] = useState(deadline);
 
   const handleSave = () => {
-    onSave({ title, content, deadline, manager });
+    onSave({ titleValue, contentValue, managerValue, deadlineValue });
     onClose();
   };
 
@@ -40,20 +40,20 @@ function CardEditModal({ title, content, manager, deadline, onClose, onSave }) {
             id="cardManager"
             type="text"
             value={managerValue}
-            onChange={(e) => setDeadline(e.target.value)}
-          />
-        </div>
-        <div className={styles.inputGroup}>
-          <label htmlFor="cardContent">카드 내용</label>
-          <input
-            id="cardContent"
-            type="date"
-            value={deadlineValue}
             onChange={(e) => setManager(e.target.value)}
           />
         </div>
+        <div className={styles.inputGroup}>
+          <label htmlFor="cardDeadLine">마감일</label>
+          <input
+            id="cardDeadLine"
+            type="date"
+            value={deadlineValue}
+            onChange={(e) => setDeadline(e.target.value)}
+          />
+        </div>
         <div className={styles.modalButtons}>
-          <button onClick={handleSave}>추가</button>
+          <button onClick={handleSave}>수정</button>
           <button onClick={onClose}>취소</button>
         </div>
       </div>
