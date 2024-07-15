@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import styles from '../styles/Modal.module.css';
 import axios from 'axios';
 
@@ -20,7 +20,7 @@ function CardModal({ onClose, onSave, boardId, id}) {
     console.log('Access Token:', accessToken);
 
     try {
-      await axios.post(
+      const response = await axios.post(
           `http://localhost:8080/boards/${boardId}/status/${id}/cards`, // API 엔드포인트 URL
           { title : title, content : content },
           {
@@ -31,12 +31,17 @@ function CardModal({ onClose, onSave, boardId, id}) {
       );
 
       // 카드 생성 성공 시, onSave를 통해 상태 업데이트
-      onSave({ title, content }); // 수정된 부분: title과 content를 전달
+      // onSave({ title, content }); // 수정된 부분: title과 content를 전달
+
+      const savedCard = response.data;
+      onSave(savedCard);
       onClose(); // 모달 닫기
     } catch (error) {
       console.error('Error creating card:', error);
     }
   };
+
+
 
   return (
     <div className={styles.modalOverlay}>
