@@ -1,5 +1,5 @@
-// Board.js
 import React, { useState } from 'react';
+import axios from 'axios';
 import { MdAddCircleOutline, MdEdit } from 'react-icons/md';
 import { FaTrashAlt, FaUserPlus } from 'react-icons/fa';
 import Column from './Column';
@@ -82,20 +82,38 @@ function Board() {
   };
 
   // 보드 추가
-  const handleAddBoard = (boardName, boardDescription) => {
-    const newBoardKey = boardName.trim();
-    const newBoard = {
-      columns: [],
-      description: boardDescription,
-    };
+  const handleAddBoard = async (boardName, boardDescription) => {
+    try {
+      const response = await axios.post('http://localhost:8080/boards', {
+        board_name: boardName,
+        introduction: boardDescription,
+      }, {
+        headers: {
+          authorization: 'Bearer <token>', // 실제 토큰으로 교체해야 함
+        },
+      });
 
-    setBoards((prevBoards) => ({
-      ...prevBoards,
-      [newBoardKey]: newBoard,
-    }));
+      if (response.status === 201) {
+        const newBoard = response.data.result;
+        const newBoardKey = newBoard.board_name.trim();
 
-    setSelectedBoard(newBoardKey);
-    setIsBoardModalOpen(false);
+        setBoards((prevBoards) => ({
+          ...prevBoards,
+          [newBoardKey]: {
+            columns: [],
+            description: newBoard.introduction,
+          },
+        }));
+
+        setSelectedBoard(newBoardKey);
+        setIsBoardModalOpen(false);
+      } else {
+        alert('보드 생성 실패');
+      }
+    } catch (error) {
+      console.error('보드 생성 오류:', error);
+      alert('보드 생성 중 오류가 발생했습니다.');
+    }
   };
 
   // 보드 수정
