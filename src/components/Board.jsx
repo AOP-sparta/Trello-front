@@ -65,7 +65,7 @@ function Board() {
 
   const handleAddColumn = (title) => {
     if (!selectedBoard) {
-      alert('Please select a board first.');
+      alert('보드를 먼저 선택해주세요.');
       return;
     }
 
@@ -84,14 +84,19 @@ function Board() {
   // 보드 추가
   const handleAddBoard = async (boardName, boardDescription) => {
     try {
-      const response = await axios.post('http://localhost:8080/boards', {
-        board_name: boardName,
-        introduction: boardDescription,
-      }, {
-        headers: {
-          authorization: 'Bearer <token>', // 실제 토큰으로 교체해야 함
+      const accessToken = localStorage.getItem('accessToken');
+      const response = await axios.post(
+        'http://localhost:8080/boards',
+        {
+          board_name: boardName,
+          introduction: boardDescription,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
       if (response.status === 201) {
         const newBoard = response.data.result;
@@ -108,18 +113,18 @@ function Board() {
         setSelectedBoard(newBoardKey);
         setIsBoardModalOpen(false);
       } else {
-        alert('보드 생성 실패');
+        alert('보드 생성에 실패했습니다.');
       }
     } catch (error) {
-      console.error('보드 생성 오류:', error);
-      alert('보드 생성 중 오류가 발생했습니다.');
+      console.error('보드 생성 에러:', error);
+      alert('보드 생성에 실패했습니다.');
     }
   };
 
   // 보드 수정
   const handleEditBoard = () => {
     if (!selectedBoard) {
-      alert('Please select a board first.');
+      alert('보드를 먼저 선택해주세요.');
       return;
     }
 
@@ -130,31 +135,54 @@ function Board() {
     setIsEditModalOpen(true);
   };
 
-  const handleSubmitEditBoard = () => {
+  const handleSubmitEditBoard = async () => {
     if (!editBoardKey || !editBoardName || !editBoardDescription) {
-      alert('Please fill in all fields.');
+      alert('모든 항목을 입력하세요.');
       return;
     }
 
-    setBoards((prevBoards) => {
-      const updatedBoards = { ...prevBoards };
-      const updatedBoard = {
-        columns: updatedBoards[selectedBoard]?.columns || [],
-        description: editBoardDescription,
-      };
-      delete updatedBoards[selectedBoard];
-      updatedBoards[editBoardName] = updatedBoard;
-      return updatedBoards;
-    });
+    try {
+      const accessToken = localStorage.getItem('accessToken');
+      const response = await axios.put(
+        `http://localhost:8080/boards/${editBoardKey}`,
+        {
+          board_name: editBoardName,
+          introduction: editBoardDescription,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
-    setSelectedBoard(editBoardName);
-    setIsEditModalOpen(false);
+      if (response.status === 200) {
+        const updatedBoard = response.data.result;
+        setBoards((prevBoards) => {
+          const updatedBoards = { ...prevBoards };
+          delete updatedBoards[editBoardKey];
+          updatedBoards[updatedBoard.board_name] = {
+            columns: updatedBoards[editBoardKey]?.columns || [],
+            description: updatedBoard.introduction,
+          };
+          return updatedBoards;
+        });
+
+        setSelectedBoard(updatedBoard.board_name);
+        setIsEditModalOpen(false);
+      } else {
+        alert('보드 수정에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('보드 수정 에러:', error);
+      alert('보드 수정에 실패했습니다.');
+    }
   };
 
   // 보드 삭제
   const handleDeleteBoard = () => {
     if (!selectedBoard) {
-      alert('Please select a board first.');
+      alert('보드를 먼저 선택해주세요.');
       return;
     }
 
