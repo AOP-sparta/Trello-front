@@ -35,7 +35,7 @@ function Signup() {
         .then(rsp => {
             if (rsp.data.msg === "회원가입 성공") {
                 console.log(rsp.data.result);
-                navigate('/board');
+                navigate('/login');
             } else {}
         })
         .catch(error => {
