@@ -51,13 +51,32 @@ function CardDetail() {
         setIsEditing(false);
     };
 
-    const handleSaveModal = ({ title, content, manager, deadline }) => {
-        setTitle(title);
-        setContent(content);
-        setManager(manager);
-        setDeadline(deadline);
-        setIsEditing(false);
-        alert(`카드 수정: ${title}`);
+    const handleSaveModal = async ({ title, content, manager, deadline }) => {
+
+        if (!title || !content || !manager || !deadline) {
+            alert("모든 필드를 입력해주세요.");
+            return;
+        }
+
+        try {
+            await axiosInstance.patch(`/boards/${boardId}/cards/${id}`, {
+                title,
+                content,
+                nickname: manager,
+                deadline,
+            });
+
+            setTitle(title);
+            setContent(content);
+            setManager(manager);
+            setDeadline(deadline);
+            alert(`카드 수정 완료: ${title}`);
+        } catch (error) {
+            console.error("카드 수정 중 오류:", error);
+            alert("카드 수정에 실패했습니다.");
+        } finally {
+            setIsEditing(false);
+        }
     };
 
     const handleConfirmDelete = () => {

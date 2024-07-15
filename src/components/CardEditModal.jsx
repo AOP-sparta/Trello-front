@@ -8,7 +8,7 @@ function CardEditModal({ title, content, manager, deadline, onSave, onClose }) {
   const [deadlineValue, setDeadline] = useState(deadline);
 
   const handleSave = () => {
-    onSave({ titleValue, contentValue, managerValue, deadlineValue });
+    onSave({ title: titleValue, content: contentValue, manager: managerValue, deadline: deadlineValue });
     onClose();
   };
 
