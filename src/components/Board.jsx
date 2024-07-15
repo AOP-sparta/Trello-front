@@ -1,9 +1,13 @@
+// Board.js
 import React, { useState } from 'react';
 import { MdAddCircleOutline, MdEdit } from 'react-icons/md';
 import { FaTrashAlt, FaUserPlus } from 'react-icons/fa';
 import Column from './Column';
 import ColumnModal from './ColumnModal';
-import BoardModal from './BoardModal';
+import AddBoardModal from './BoardModal/AddBoardModal';
+import EditBoardModal from './BoardModal/EditBoardModal';
+import DeleteBoardModal from './BoardModal/DeleteBoardModal';
+import InviteUserModal from './BoardModal/InviteUserModal';
 import styles from '../styles/Board.module.css';
 
 function Board() {
@@ -11,21 +15,28 @@ function Board() {
   const [boards, setBoards] = useState({
     '보드 1': {
       columns: [
-        { id: 1, title: '🗒️ To Do', cards: [{ text: 'Task 1', user: 'OOO 님' }, { text: 'Task 2', user: 'OOO 님' }] },
-        { id: 2, title: '💻 In Progress', cards: [{ text: 'Task 3', user: 'OOO 님' }, { text: 'Task 4', user: 'OOO 님' }] },
-        { id: 3, title: '🚀 Done', cards: [{ text: 'Task 5', user: 'OOO 님' }, { text: 'Task 6', user: 'OOO 님' }] },
+        { id: 1, title: '🗒️ To Do', cards: [{ id: 1, text: 'Task 1', user: 'OOO 님' }, { id: 2, text: 'Task 2', user: 'OOO 님' }] },
+        { id: 2, title: '💻 In Progress', cards: [{ id: 3, text: 'Task 3', user: 'OOO 님' }, { id: 4, text: 'Task 4', user: 'OOO 님' }] },
+        { id: 3, title: '🚀 Done', cards: [{ id: 5, text: 'Task 5', user: 'OOO 님' }, { id: 6, text: 'Task 6', user: 'OOO 님' }] },
       ],
     },
     '보드 2': {
       columns: [
-        { id: 4, title: '🗒️ To Do', cards: [{ text: 'Task A', user: 'OOO 님' }, { text: 'Task B', user: 'OOO 님' }] },
-        { id: 5, title: '💻 In Progress', cards: [{ text: 'Task C', user: 'OOO 님' }, { text: 'Task D', user: 'OOO 님' }] },
-        { id: 6, title: '🚀 Done', cards: [{ text: 'Task E', user: 'OOO 님' }, { text: 'Task F', user: 'OOO 님' }] },
+        { id: 4, title: '🗒️ To Do', cards: [{ id: 7, text: 'Task A', user: 'OOO 님' }, { id: 8, text: 'Task B', user: 'OOO 님' }] },
+        { id: 5, title: '💻 In Progress', cards: [{ id: 9, text: 'Task C', user: 'OOO 님' }, { id: 10, text: 'Task D', user: 'OOO 님' }] },
+        { id: 6, title: '🚀 Done', cards: [{ id: 11, text: 'Task E', user: 'OOO 님' }, { id: 12, text: 'Task F', user: 'OOO 님' }] },
       ],
     },
   });
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isColumnModalOpen, setIsColumnModalOpen] = useState(false);
+  const [isBoardModalOpen, setIsBoardModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editBoardKey, setEditBoardKey] = useState('');
+  const [editBoardName, setEditBoardName] = useState('');
+  const [editBoardDescription, setEditBoardDescription] = useState('');
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); 
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false); 
 
   const handleBoardChange = (event) => {
     setSelectedBoard(event.target.value);
@@ -59,7 +70,7 @@ function Board() {
     }
 
     const newColumnId = new Date().getTime();
-    const newColumn = { id: newColumnId, title: title, cards: [] }; // 입력한 컬럼의 제목 사용
+    const newColumn = { id: newColumnId, title: title, cards: [] };
 
     setBoards((prevBoards) => {
       const updatedBoards = { ...prevBoards };
@@ -67,11 +78,12 @@ function Board() {
       return updatedBoards;
     });
 
-    setIsModalOpen(false); // 모달 닫기
+    setIsColumnModalOpen(false);
   };
 
+  // 보드 추가
   const handleAddBoard = (boardName, boardDescription) => {
-    const newBoardKey = boardName.trim(); // 보드 이름에서 공백 제거
+    const newBoardKey = boardName.trim();
     const newBoard = {
       columns: [],
       description: boardDescription,
@@ -83,22 +95,89 @@ function Board() {
     }));
 
     setSelectedBoard(newBoardKey);
-    setIsModalOpen(false); // 모달 닫기
+    setIsBoardModalOpen(false);
   };
 
+  // 보드 수정
   const handleEditBoard = () => {
-    // 보드 수정 기능을 구현하세요
-    alert('보드 수정 기능을 구현하세요');
+    if (!selectedBoard) {
+      alert('Please select a board first.');
+      return;
+    }
+
+    setEditBoardKey(selectedBoard);
+    setEditBoardName(selectedBoard);
+    setEditBoardDescription(boards[selectedBoard]?.description || '');
+
+    setIsEditModalOpen(true);
   };
 
+  const handleSubmitEditBoard = () => {
+    if (!editBoardKey || !editBoardName || !editBoardDescription) {
+      alert('Please fill in all fields.');
+      return;
+    }
+
+    setBoards((prevBoards) => {
+      const updatedBoards = { ...prevBoards };
+      const updatedBoard = {
+        columns: updatedBoards[selectedBoard]?.columns || [],
+        description: editBoardDescription,
+      };
+      delete updatedBoards[selectedBoard];
+      updatedBoards[editBoardName] = updatedBoard;
+      return updatedBoards;
+    });
+
+    setSelectedBoard(editBoardName);
+    setIsEditModalOpen(false);
+  };
+
+  // 보드 삭제
   const handleDeleteBoard = () => {
-    // 보드 삭제 기능을 구현하세요
-    alert('보드 삭제 기능을 구현하세요');
+    if (!selectedBoard) {
+      alert('Please select a board first.');
+      return;
+    }
+
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteBoard = () => {
+    setBoards((prevBoards) => {
+      const updatedBoards = { ...prevBoards };
+      delete updatedBoards[selectedBoard];
+      return updatedBoards;
+    });
+
+    setSelectedBoard('');
+    setIsDeleteModalOpen(false);
   };
 
   const handleInviteUser = () => {
-    // 사용자 초대 기능을 구현하세요
-    alert('사용자 초대 기능을 구현하세요');
+    setIsInviteModalOpen(true);
+  };
+
+  const sendInvitation = (email) => {
+    // 여기에 실제로 초대 메일을 보내는 로직 추가
+    console.log(`Inviting user with email: ${email}`);
+    setIsInviteModalOpen(false);
+  };
+
+  const handleMoveCard = (cardId, fromColumnId, toColumnId) => {
+    setBoards((prevBoards) => {
+      const updatedBoards = { ...prevBoards };
+      const fromColumnIndex = updatedBoards[selectedBoard].columns.findIndex((column) => column.id === fromColumnId);
+      const toColumnIndex = updatedBoards[selectedBoard].columns.findIndex((column) => column.id === toColumnId);
+
+      if (fromColumnIndex !== -1 && toColumnIndex !== -1) {
+        const cardIndex = updatedBoards[selectedBoard].columns[fromColumnIndex].cards.findIndex((card) => card.id === cardId);
+        const [movedCard] = updatedBoards[selectedBoard].columns[fromColumnIndex].cards.splice(cardIndex, 1);
+        updatedBoards[selectedBoard].columns[toColumnIndex].cards.push(movedCard);
+      }
+
+      return updatedBoards;
+    });
   };
 
   const selectedColumns = boards[selectedBoard]?.columns || [];
@@ -117,7 +196,7 @@ function Board() {
     <div className={styles.board}>
       <span className={styles.boardIcons}>
         <span className={styles.boardText}>Board</span>
-        <MdAddCircleOutline onClick={() => setIsModalOpen(true)} className={styles.boardIcon} size={25} />
+        <MdAddCircleOutline onClick={() => setIsBoardModalOpen(true)} className={styles.boardIcon} size={25} />
         <MdEdit onClick={handleEditBoard} className={styles.boardIcon} size={25} />
         <FaTrashAlt onClick={handleDeleteBoard} className={styles.boardIcon} size={23} />
         <FaUserPlus onClick={handleInviteUser} className={styles.boardIcon} size={24} />
@@ -133,7 +212,7 @@ function Board() {
             <option key={boardKey} value={boardKey}>{boardKey}</option>
           ))}
         </select>
-        <div className={styles.addColumnButton} onClick={() => setIsModalOpen(true)}>
+        <div className={styles.addColumnButton} onClick={() => setIsColumnModalOpen(true)}>
           <MdAddCircleOutline className={styles.addColumnIcon} size={24} />
           <span className={styles.addColumnText}>Add Column</span>
         </div>
@@ -149,12 +228,31 @@ function Board() {
                 cards={column.cards}
                 onDeleteColumn={handleDeleteColumn}
                 onAddCard={handleAddCard}
+                onMoveCard={handleMoveCard}
               />
             ))}
           </div>
         ))}
       </div>
-      <BoardModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAddBoard={handleAddBoard} />
+      <ColumnModal isOpen={isColumnModalOpen} onClose={() => setIsColumnModalOpen(false)} onAddColumn={handleAddColumn} />
+      <AddBoardModal isOpen={isBoardModalOpen} onClose={() => setIsBoardModalOpen(false)} onAddBoard={handleAddBoard} />
+      <EditBoardModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        boardName={editBoardName}
+        boardDescription={editBoardDescription}
+        onSubmit={handleSubmitEditBoard}
+        onNameChange={setEditBoardName}
+        onDescriptionChange={setEditBoardDescription}
+      />
+      <DeleteBoardModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onDelete={confirmDeleteBoard}
+      />
+      <InviteUserModal isOpen={isInviteModalOpen} 
+      onClose={() => setIsInviteModalOpen(false)} 
+      onInvite={sendInvitation} />
     </div>
   );
 }

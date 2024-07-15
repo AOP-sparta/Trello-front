@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import styles from '../styles/BoardModal.module.css';
+import styles from '../../styles/BoardModal.module.css';
 
-function BoardModal({ isOpen, onClose, onAddBoard }) {
+function AddBoardModal({ isOpen, onClose, onAddBoard }) {
   const [boardName, setBoardName] = useState('');
   const [boardDescription, setBoardDescription] = useState('');
 
@@ -41,4 +41,4 @@ function BoardModal({ isOpen, onClose, onAddBoard }) {
   );
 }
 
-export default BoardModal;
+export default AddBoardModal;
