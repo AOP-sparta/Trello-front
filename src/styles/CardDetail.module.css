@@ -45,6 +45,18 @@
     margin-bottom: 20px;
 }
 
+.icons {
+    display: flex;
+    gap: 8px; /* optional: adds space between icons */
+}
+
+.editIcon,
+.deleteIcon {
+  cursor: pointer;
+  font-size: 18px;
+  color: #888;
+}
+
 .cardBody {
     margin-top: 20px;
 }
