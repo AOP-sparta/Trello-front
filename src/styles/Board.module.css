@@ -1,12 +1,20 @@
-.board {
+   .board {
     padding: 20px;
   }
   
+  .boardHeader {
+    align-items: center;
+  }
+  
+  .boardText {
+    color: grey;
+  }
+
   .columns {
     display: flex;
     margin-bottom: 20px;
   }
-
+  
   .selectBoard {
     margin: 20px 0;
     display: flex;
@@ -35,20 +43,20 @@
   .selectBoard select:focus {
     border-color: #555;
   }
-
+  
   .addColumnButton {
     display: flex;
     align-items: center;
     cursor: pointer;
     color: grey;
     margin-left: 10px;
-    padding: 10px 20px; 
-    border-radius: 5px; 
+    padding: 10px 20px;
+    border-radius: 5px;
   }
   
   .addColumnButton:hover {
-    background-color: #e5e5e5; 
-    color: grey; 
+    background-color: #e5e5e5;
+    color: grey;
   }
   
   .addColumnIcon {
@@ -56,9 +64,28 @@
   }
   
   .addColumnText {
-    color: inherit; 
+    color: inherit;
   }
-
+  
+  .boardIcons {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 30px;
+    gap: 10px;
+  }
+  
+  .boardIcon {
+    margin-left: 10px;
+    cursor: pointer;
+    color: grey;
+  }
+  
+  .boardIcon:hover {
+    color: #555;
+  }
+  
   .modalOpen {
     display: block;
     position: fixed;

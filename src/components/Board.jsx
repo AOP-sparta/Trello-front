@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { MdAddCircleOutline } from 'react-icons/md';
+import { MdAddCircleOutline, MdEdit } from 'react-icons/md';
+import { FaTrashAlt, FaUserPlus } from 'react-icons/fa';
 import Column from './Column';
 import ColumnModal from './ColumnModal';
 import styles from '../styles/Board.module.css';
@@ -68,6 +69,25 @@ function Board() {
     setIsModalOpen(false); // 모달 닫기
   };
 
+  const handleAddBoard = () => {
+    alert('보드 추가 기능을 구현하세요');
+  };
+
+  const handleEditBoard = () => {
+    // 보드 수정 기능을 구현하세요
+    alert('보드 수정 기능을 구현하세요');
+  };
+
+  const handleDeleteBoard = () => {
+    // 보드 삭제 기능을 구현하세요
+    alert('보드 삭제 기능을 구현하세요');
+  };
+
+  const handleInviteUser = () => {
+    // 사용자 초대 기능을 구현하세요
+    alert('사용자 초대 기능을 구현하세요');
+  };
+
   const selectedColumns = boards[selectedBoard]?.columns || [];
 
   const chunkColumns = (columns, chunkSize) => {
@@ -82,7 +102,16 @@ function Board() {
 
   return (
     <div className={styles.board}>
-      <h1>{selectedBoard || '보드 이름'}</h1>
+      <span className={styles.boardIcons}>
+      <span className={styles.boardText}>Board</span>
+          <MdAddCircleOutline onClick={handleAddBoard} className={styles.boardIcon} size={25} />
+          <MdEdit onClick={handleEditBoard} className={styles.boardIcon} size={25} />
+          <FaTrashAlt onClick={handleDeleteBoard} className={styles.boardIcon} size={23} />
+          <FaUserPlus onClick={handleInviteUser} className={styles.boardIcon} size={24} />
+      </span>
+      <div className={styles.boardHeader}>
+        <h1>{selectedBoard || '보드 이름'}</h1>
+      </div>
       <p>보드 한 줄 설명</p>
       <div className={styles.selectBoard}>
         <select id="board-select" value={selectedBoard} onChange={handleBoardChange}>
