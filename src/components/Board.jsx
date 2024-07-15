@@ -3,7 +3,8 @@ import { MdAddCircleOutline, MdEdit } from 'react-icons/md';
 import { FaTrashAlt, FaUserPlus } from 'react-icons/fa';
 import Column from './Column';
 import ColumnModal from './ColumnModal';
-import BoardModal from './BoardModal';
+import AddBoardModal from './AddBoardModal';
+import EditBoardModal from './EditBoardModal';
 import styles from '../styles/Board.module.css';
 
 function Board() {
@@ -27,6 +28,11 @@ function Board() {
 
   const [isColumnModalOpen, setIsColumnModalOpen] = useState(false);
   const [isBoardModalOpen, setIsBoardModalOpen] = useState(false);
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editBoardKey, setEditBoardKey] = useState('');
+  const [editBoardName, setEditBoardName] = useState('');
+  const [editBoardDescription, setEditBoardDescription] = useState('');
 
   const handleBoardChange = (event) => {
     setSelectedBoard(event.target.value);
@@ -88,7 +94,37 @@ function Board() {
   };
 
   const handleEditBoard = () => {
-    alert('보드 수정 기능을 구현하세요');
+    if (!selectedBoard) {
+      alert('Please select a board first.');
+      return;
+    }
+
+    setEditBoardKey(selectedBoard);
+    setEditBoardName(selectedBoard);
+    setEditBoardDescription(boards[selectedBoard]?.description || '');
+
+    setIsEditModalOpen(true);
+  };
+
+  const handleSubmitEditBoard = () => {
+    if (!editBoardKey || !editBoardName || !editBoardDescription) {
+      alert('Please fill in all fields.');
+      return;
+    }
+
+    setBoards((prevBoards) => {
+      const updatedBoards = { ...prevBoards };
+      const updatedBoard = {
+        columns: updatedBoards[selectedBoard]?.columns || [],
+        description: editBoardDescription,
+      };
+      delete updatedBoards[selectedBoard];
+      updatedBoards[editBoardName] = updatedBoard;
+      return updatedBoards;
+    });
+
+    setSelectedBoard(editBoardName);
+    setIsEditModalOpen(false);
   };
 
   const handleDeleteBoard = () => {
@@ -153,7 +189,16 @@ function Board() {
         ))}
       </div>
       <ColumnModal isOpen={isColumnModalOpen} onClose={() => setIsColumnModalOpen(false)} onAddColumn={handleAddColumn} />
-      <BoardModal isOpen={isBoardModalOpen} onClose={() => setIsBoardModalOpen(false)} onAddBoard={handleAddBoard} />
+      <AddBoardModal isOpen={isBoardModalOpen} onClose={() => setIsBoardModalOpen(false)} onAddBoard={handleAddBoard} />
+      <EditBoardModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        boardName={editBoardName}
+        boardDescription={editBoardDescription}
+        onSubmit={handleSubmitEditBoard}
+        onNameChange={setEditBoardName}
+        onDescriptionChange={setEditBoardDescription}
+      />
     </div>
   );
 }

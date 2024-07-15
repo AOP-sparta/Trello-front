@@ -1,39 +1,30 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styles from '../styles/BoardModal.module.css';
 
-function BoardModal({ isOpen, onClose, onAddBoard }) {
-  const [boardName, setBoardName] = useState('');
-  const [boardDescription, setBoardDescription] = useState('');
-
+function EditBoardModal({ isOpen, onClose, boardName, boardDescription, onSubmit, onNameChange, onDescriptionChange }) {
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (boardName && boardDescription) {
-      onAddBoard(boardName, boardDescription);
-      setBoardName('');
-      setBoardDescription('');
-    } else {
-      alert('Please fill in all fields.');
-    }
+    onSubmit();
   };
 
   return (
     <div className={isOpen ? styles.modalOpen : styles.modalClosed}>
       <div className={styles.modal}>
-        <h2>새 보드 추가</h2>
+        <h2>보드 수정</h2>
         <form onSubmit={handleSubmit}>
           <input
             type="text"
             placeholder="보드 이름"
             value={boardName}
-            onChange={(e) => setBoardName(e.target.value)}
+            onChange={(e) => onNameChange(e.target.value)}
           />
           <input
             type="text"
             placeholder="한 줄 소개"
             value={boardDescription}
-            onChange={(e) => setBoardDescription(e.target.value)}
+            onChange={(e) => onDescriptionChange(e.target.value)}
           />
-          <button type="submit">추가</button>
+          <button type="submit">수정</button>
           <button type="button" onClick={onClose}>취소</button>
         </form>
       </div>
@@ -41,4 +32,4 @@ function BoardModal({ isOpen, onClose, onAddBoard }) {
   );
 }
 
-export default BoardModal;
+export default EditBoardModal;
