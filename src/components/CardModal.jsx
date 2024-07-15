@@ -33,14 +33,13 @@ function CardModal({ onClose, onSave, boardId, id}) {
       // 카드 생성 성공 시, onSave를 통해 상태 업데이트
       // onSave({ title, content }); // 수정된 부분: title과 content를 전달
 
-      const savedCard = response.data;
+      const savedCard = response.data.result;
       onSave(savedCard);
       onClose(); // 모달 닫기
     } catch (error) {
       console.error('Error creating card:', error);
     }
   };
-
 
 
   return (

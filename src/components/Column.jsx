@@ -79,13 +79,13 @@ function Column({id, title, cards, onDeleteColumn, onAddCard, onMoveCard, boardI
         }
 
         try {
-            const response = await axios.get(`http://localhost:8080/boards/${boardId}/cards?status=${id}`,
+            const response = await axios.get(`http://localhost:8080/boards/${boardId}/cards?status=${title}`,
                 {
                     headers: {
                         Authorization: `Bearer ${accessToken}`
                     }
                 });
-            setCardList(response.data);
+            setCardList(response.data.result);
         } catch (error) {
             console.error(error);
         }
@@ -132,7 +132,7 @@ function Column({id, title, cards, onDeleteColumn, onAddCard, onMoveCard, boardI
                     />
                 )}
                 {cardList.map((card, index) => (
-                    <Card key={index} id={card.id} columnId={id} text={card.text} user={card.user}/>
+                    <Card key={index} id={card.id} columnId={id} text={card.title} user={card.nickname}/>
                 ))}
             </div>
             <div className={styles.addCardIcon} onClick={handleAddCardClick}>
