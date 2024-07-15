@@ -26,7 +26,6 @@ function Board() {
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isBoardModalOpen, setIsBoardModalOpen] = useState(false); 
 
   const handleBoardChange = (event) => {
     setSelectedBoard(event.target.value);
@@ -71,35 +70,35 @@ function Board() {
     setIsModalOpen(false); // 모달 닫기
   };
 
-  // 보드 추가
-  const handleAddBoard = (name, description) => {
+  const handleAddBoard = (boardName, boardDescription) => {
+    const newBoardKey = boardName.trim(); // 보드 이름에서 공백 제거
     const newBoard = {
-      [name]: {
-        columns: [],
-        description: description,
-      },
+      columns: [],
+      description: boardDescription,
     };
 
     setBoards((prevBoards) => ({
       ...prevBoards,
-      ...newBoard,
+      [newBoardKey]: newBoard,
     }));
 
-    setIsBoardModalOpen(false); // Close the modal after adding the board
+    setSelectedBoard(newBoardKey);
+    setIsModalOpen(false); // 모달 닫기
   };
 
-  // 보드 수정
   const handleEditBoard = () => {
+    // 보드 수정 기능을 구현하세요
     alert('보드 수정 기능을 구현하세요');
   };
 
-  // 보드 삭제
   const handleDeleteBoard = () => {
+    // 보드 삭제 기능을 구현하세요
     alert('보드 삭제 기능을 구현하세요');
   };
 
-  // 보드 사용자 초대
   const handleInviteUser = () => {
+    // 사용자 초대 기능을 구현하세요
+    alert('사용자 초대 기능을 구현하세요');
   };
 
   const selectedColumns = boards[selectedBoard]?.columns || [];
@@ -117,21 +116,22 @@ function Board() {
   return (
     <div className={styles.board}>
       <span className={styles.boardIcons}>
-      <span className={styles.boardText}>Board</span>
-      <MdAddCircleOutline onClick={() => setIsBoardModalOpen(true)} className={styles.boardIcon} size={25} />
-      <MdEdit onClick={handleEditBoard} className={styles.boardIcon} size={25} />
-          <FaTrashAlt onClick={handleDeleteBoard} className={styles.boardIcon} size={23} />
-          <FaUserPlus onClick={handleInviteUser} className={styles.boardIcon} size={24} />
+        <span className={styles.boardText}>Board</span>
+        <MdAddCircleOutline onClick={() => setIsModalOpen(true)} className={styles.boardIcon} size={25} />
+        <MdEdit onClick={handleEditBoard} className={styles.boardIcon} size={25} />
+        <FaTrashAlt onClick={handleDeleteBoard} className={styles.boardIcon} size={23} />
+        <FaUserPlus onClick={handleInviteUser} className={styles.boardIcon} size={24} />
       </span>
       <div className={styles.boardHeader}>
         <h1>{selectedBoard || '보드 이름'}</h1>
+        <p>{boards[selectedBoard]?.description || '보드 한 줄 설명'}</p>
       </div>
-      <p>보드 한 줄 설명</p>
       <div className={styles.selectBoard}>
         <select id="board-select" value={selectedBoard} onChange={handleBoardChange}>
           <option value="" disabled>보드 선택</option>
-          <option value="보드 1">보드 1</option>
-          <option value="보드 2">보드 2</option>
+          {Object.keys(boards).map((boardKey) => (
+            <option key={boardKey} value={boardKey}>{boardKey}</option>
+          ))}
         </select>
         <div className={styles.addColumnButton} onClick={() => setIsModalOpen(true)}>
           <MdAddCircleOutline className={styles.addColumnIcon} size={24} />
@@ -154,9 +154,7 @@ function Board() {
           </div>
         ))}
       </div>
-      <ColumnModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAddColumn={handleAddColumn} />
-      <BoardModal isOpen={isBoardModalOpen} onClose={() => setIsBoardModalOpen(false)} onAddBoard={handleAddBoard} />
-
+      <BoardModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAddBoard={handleAddBoard} />
     </div>
   );
 }
