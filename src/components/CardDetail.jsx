@@ -7,6 +7,8 @@ import { MdEdit, MdAddCircleOutline } from 'react-icons/md';
 import { FaTrashAlt } from 'react-icons/fa';
 import Comment from '../components/Comment';
 import CardEditModal from './CardEditModal';
+import DeleteModal from './DeleteModal';
+import axios from 'axios';
 
 function CardDetail() {
     const navigate = useNavigate();
@@ -24,15 +26,31 @@ function CardDetail() {
     const location = useLocation();
     const { id } = location.state || {}; // 카드 id임
     const [isEditing, setIsEditing] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+
     const [titleValue, setTitle] = useState(title);
     const [contentValue, setContent] = useState(content);
     const [managerValue, setManager] = useState(manager);
     const [deadlineValue, setDeadline] = useState(deadline);
+    const [comments, setComments] = useState([]);
 
     const commentInput = useRef();
 
+    // Axios 인스턴스 생성
+    const axiosInstance = axios.create({
+        baseURL: 'http://localhost:8080', // API 기본 URL 설정
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+            'Content-Type': 'application/json'
+        }
+    });
+
     const handleEditClick = () => {
         setIsEditing(true);
+    };
+
+    const handleDeleteClick = () => {
+        setIsDeleting(true);
     };
 
     const handleCloseModal = () => {
@@ -48,15 +66,53 @@ function CardDetail() {
         alert(`카드 수정: ${titleValue}`);
     };
 
-    const handleSendClick = () => {
-        // 댓글 작성 api
+    const handleConfirmDelete = () => {
+        setIsDeleting(false);
+        // 카드 삭제 api
 
+        navigate('/board');
+    };
 
+    const handleSendClick = async () => {
+        const commentContent = commentInput.current.value;
+
+        if (!commentContent) {
+            alert("댓글 내용을 입력하세요.");
+            return;
+        }
+
+        try {
+            await axiosInstance.post(`/cards/${id}/comments`, {
+                id,
+                content: commentContent,
+            });
+
+            fetchComments(id);
+            commentInput.current.value = ""; // 입력 필드 초기화
+        } catch (error) {
+            console.error("댓글 작성 중 오류:", error);
+            alert("댓글 작성에 실패했습니다.");
+        }
     };
 
     const handleBoardClick = () => {
         navigate('/board');
     };
+
+    const fetchComments = async (id) => {
+        try {
+            const response = await axiosInstance.get(`/cards/${id}/comments`); 
+            setComments(response.data);
+        } catch (error) {
+            console.error("댓글 가져오기 중 오류:", error);
+        }
+    };
+
+    useEffect(() => {
+        if (id) {
+            fetchComments(id);
+        }
+    }, [id]);
 
     return (
         <div className={styles.container}>
@@ -68,7 +124,10 @@ function CardDetail() {
                 <div className={styles.cardDetail}>
                     <div className={styles.cardHeader}>
                         <span className={styles.cardTitle}>{titleValue}</span>
-                        <MdEdit className={styles.editIcon} onClick={handleEditClick} />
+                        <div className={styles.icons}>
+                            <MdEdit className={styles.editIcon} onClick={handleEditClick} />
+                            <FaTrashAlt className={styles.deleteIcon} onClick={handleDeleteClick} />
+                        </div>
                     </div>
                     <div className={styles.cardBody}>
                         <div className={styles.cardInfo}>
@@ -81,20 +140,29 @@ function CardDetail() {
                     </div>
                     {isEditing && (
                         <CardEditModal
-                            title={title}
-                            content={content}
-                            manager={manager}
+                            title={titleValue}
+                            content={contentValue}
+                            manager={managerValue}
                             deadline={deadline}
                             onSave={handleSaveModal}
                             onClose={handleCloseModal}
                         />
                     )}
+                    {isDeleting && (
+                        <DeleteModal
+                            title={`"${titleValue}" 삭제`}
+                            content="정말로 삭제하시겠습니까?"
+                            onClose={handleCloseModal}
+                            onConfirm={handleConfirmDelete}
+                            confirmText="삭제"
+                        />
+                    )}
                 </div>
                 <div className={styles.commentsSection}>
                     <h3>댓글</h3>
-                    <Comment text={"api 연동 후 가져온 댓글 리스트로 생성 해야 함"} />
-                    <Comment text={"댓글2"} />
-                    <Comment text={"댓글3"} />
+                    {comments.map(comment => (
+                        <Comment key={comment.id} text={comment.content} user={comment.user} />
+                    ))}
                     <div className={styles.commentInputContainer}>
                         <input
                             className={styles.commentInput}

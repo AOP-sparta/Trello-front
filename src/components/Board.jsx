@@ -1,5 +1,5 @@
-// Board.js
 import React, { useState } from 'react';
+import axios from 'axios';
 import { MdAddCircleOutline, MdEdit } from 'react-icons/md';
 import { FaTrashAlt, FaUserPlus } from 'react-icons/fa';
 import Column from './Column';
@@ -86,21 +86,59 @@ function Board() {
     setIsColumnModalOpen(false);
   };
 
+  const getAccessToken = () => {
+    return localStorage.getItem('accessToken');
+  };
+
   // 보드 추가
-  const handleAddBoard = (boardName, boardDescription) => {
-    const newBoardKey = boardName.trim();
-    const newBoard = {
-      columns: [],
-      description: boardDescription,
-    };
+  const handleAddBoard = async (boardName, boardDescription) => {
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+      alert('Access token is missing. Please log in.');
+      return;
+    }
 
-    setBoards((prevBoards) => ({
-      ...prevBoards,
-      [newBoardKey]: newBoard,
-    }));
+    console.log('Access Token:', accessToken);
 
-    setSelectedBoard(newBoardKey);
-    setIsBoardModalOpen(false);
+    try {
+      const response = await axios.post('http://localhost:8080/boards', {
+        boardName: boardName,
+        introduction: boardDescription,
+      }, {
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+
+      if (response.status === 201) {
+        const newBoard = response.data.result;
+        const newBoardKey = newBoard.boardName.trim();
+
+        setBoards((prevBoards) => ({
+          ...prevBoards,
+          [newBoardKey]: {
+            columns: [],
+            description: newBoard.introduction,
+          },
+        }));
+
+        setSelectedBoard(newBoardKey);
+        setIsBoardModalOpen(false);
+
+        console.log('보드 생성 응답 데이터:', response.data); // 응답 데이터만 출력
+      } else {
+        alert('보드 생성 실패');
+      }
+    } catch (error) {
+      console.error('보드 생성 오류:', error);
+      if (error.response && error.response.status === 403) {
+        console.log('Full error response:', error.response);
+        alert('권한이 없습니다.');
+      } else {
+        alert('보드 생성 중 오류가 발생했습니다.');
+      }
+    }
   };
 
   // 보드 수정
