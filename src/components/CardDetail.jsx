@@ -7,6 +7,7 @@ import { MdEdit, MdAddCircleOutline } from 'react-icons/md';
 import { FaTrashAlt } from 'react-icons/fa';
 import Comment from '../components/Comment';
 import CardEditModal from './CardEditModal';
+import axios from 'axios';
 
 function CardDetail() {
     const navigate = useNavigate();
@@ -28,8 +29,18 @@ function CardDetail() {
     const [contentValue, setContent] = useState(content);
     const [managerValue, setManager] = useState(manager);
     const [deadlineValue, setDeadline] = useState(deadline);
+    const [comments, setComments] = useState([]);
 
     const commentInput = useRef();
+
+    // Axios 인스턴스 생성
+    const axiosInstance = axios.create({
+        baseURL: 'http://localhost:8080', // API 기본 URL 설정
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+            'Content-Type': 'application/json'
+        }
+    });
 
     const handleEditClick = () => {
         setIsEditing(true);
@@ -57,6 +68,21 @@ function CardDetail() {
     const handleBoardClick = () => {
         navigate('/board');
     };
+
+    const fetchComments = async (id) => {
+        try {
+            const response = await axiosInstance.get(`/cards/${id}/comments`); 
+            setComments(response.data);
+        } catch (error) {
+            console.error("댓글 가져오기 중 오류:", error);
+        }
+    };
+
+    useEffect(() => {
+        if (id) {
+            fetchComments(id);
+        }
+    }, [id]);
 
     return (
         <div className={styles.container}>
@@ -92,9 +118,9 @@ function CardDetail() {
                 </div>
                 <div className={styles.commentsSection}>
                     <h3>댓글</h3>
-                    <Comment text={"api 연동 후 가져온 댓글 리스트로 생성 해야 함"} />
-                    <Comment text={"댓글2"} />
-                    <Comment text={"댓글3"} />
+                    {comments.map(comment => (
+                        <Comment key={comment.id} text={comment.content} user={comment.user} />
+                    ))}
                     <div className={styles.commentInputContainer}>
                         <input
                             className={styles.commentInput}
