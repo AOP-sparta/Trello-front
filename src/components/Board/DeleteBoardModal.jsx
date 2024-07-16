@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../../styles/BoardModal.module.css';
+import styles from '../../styles/Board.module.css';
 
 function DeleteBoardModal({ isOpen, onClose, onDelete }) {
   const handleDelete = () => {

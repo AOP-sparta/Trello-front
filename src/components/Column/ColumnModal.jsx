@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import styles from '../styles/Board.module.css';
+import styles from '../../styles/Board.module.css';
 
 function ColumnModal({ isOpen, onClose, onAddColumn }) {
   const [newColumnTitle, setNewColumnTitle] = useState('');

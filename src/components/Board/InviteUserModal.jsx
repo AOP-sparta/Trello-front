@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from '../../styles/BoardModal.module.css';
+import styles from '../../styles/Board.module.css';
 
 function InviteUserModal({ isOpen, onClose, onInvite }) {
   const [email, setEmail] = useState('');

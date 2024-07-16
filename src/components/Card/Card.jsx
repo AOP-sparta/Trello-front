@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDrag } from 'react-dnd';
-import styles from '../styles/Card.module.css';
+import styles from '../../styles/Card.module.css';
 
 
 function Card({ text, user, id, columnId, boardId }) {

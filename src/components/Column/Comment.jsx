@@ -1,6 +1,5 @@
 import React from 'react';
-import { useRef, useEffect } from 'react' 
-import styles from '../styles/CardDetail.module.css';
+import styles from '../../styles/CardDetail.module.css';
 
 function Comment({ text }) {
     return (

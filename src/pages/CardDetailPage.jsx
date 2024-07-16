@@ -1,5 +1,5 @@
 import React from 'react';
-import CardDetail from '../components/CardDetail';
+import CardDetail from '../components/Card/CardDetail';
 
 function CardDetailPage() {
   return (

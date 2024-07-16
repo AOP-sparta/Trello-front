@@ -4,12 +4,11 @@ import axios from 'axios';
 import { useDrop } from 'react-dnd';
 import { MdEdit, MdAddCircleOutline } from 'react-icons/md';
 import { FaTrashAlt } from 'react-icons/fa';
-import Card from './Card';
-import styles from '../styles/Column.module.css';
+import Card from '../Card/Card';
+import styles from '../../styles/Column.module.css';
 import EditModal from './EditModal';
 import DeleteModal from './DeleteModal';
-import CardModal from './CardModal';
-import board from "./Board";
+import CardModal from '../Card/CardModal';
 
 function Column({id, title, cards =[], onDeleteColumn, onAddCard, onMoveCard, boardId}) {
     const [isEditing, setIsEditing] = useState(false);
@@ -92,7 +91,6 @@ function Column({id, title, cards =[], onDeleteColumn, onAddCard, onMoveCard, bo
     };
 
     useEffect(() => {
-        console.log("??");
         fetchCards();
     }, []);
 

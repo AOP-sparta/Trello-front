@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from '../styles/Modal.module.css';
+import styles from '../../styles/Modal.module.css';
 
 function EditModal({ title, initialValue, onSave, onClose }) {
   const [value, setValue] = useState(initialValue);

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useRef, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
-import styles from '../styles/CardDetail.module.css';
+import styles from '../../styles/CardDetail.module.css';
 import { SlArrowUpCircle } from "react-icons/sl";
 import { MdEdit, MdAddCircleOutline } from 'react-icons/md';
 import { FaTrashAlt } from 'react-icons/fa';
-import Comment from '../components/Comment';
+import Comment from '../Column/Comment';
 import CardEditModal from './CardEditModal';
-import DeleteModal from './DeleteModal';
+import DeleteModal from '../Column/DeleteModal';
 import axios from 'axios';
 
 function CardDetail() {

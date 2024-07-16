@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from '../styles/Modal.module.css';
+import styles from '../../styles/Modal.module.css';
 
 function CardEditModal({ title, content, manager, deadline, onSave, onClose }) {
   const [titleValue, setTitle] = useState(title);
