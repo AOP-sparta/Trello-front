@@ -416,6 +416,7 @@ function Board() {
                 onDeleteColumn={handleDeleteColumn}
                 onAddCard={handleAddCard}
                 onMoveCard={handleMoveCard}
+                boardId={boards[selectedBoard].id}
               />
             ))}
           </div>

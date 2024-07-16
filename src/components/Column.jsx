@@ -9,7 +9,7 @@ import EditModal from './EditModal';
 import DeleteModal from './DeleteModal';
 import CardModal from './CardModal';
 
-function Column({ id, title, cards =[], onDeleteColumn, onAddCard, onMoveCard }) {
+function Column({ id, title, cards =[], onDeleteColumn, onAddCard, onMoveCard, boardId }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [columnTitle, setColumnTitle] = useState(title);
@@ -93,6 +93,8 @@ function Column({ id, title, cards =[], onDeleteColumn, onAddCard, onMoveCard })
               <CardModal
                   onClose={handleCloseModal}
                   onSave={handleSaveCard}
+                  boardId={boardId}
+                  id={id}
               />
           )}
           {cards.map((card, index) => (
