@@ -9,6 +9,7 @@ import EditBoardModal from './BoardModal/EditBoardModal';
 import DeleteBoardModal from './BoardModal/DeleteBoardModal';
 import InviteUserModal from './BoardModal/InviteUserModal';
 import styles from '../styles/Board.module.css';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 function Board() {
   const [selectedBoard, setSelectedBoard] = useState('');
@@ -105,6 +106,7 @@ function Board() {
         setStatuses(response.data.result);
       };
 
+      console.log()
       fetchStatuses();
     } catch (error) {
       console.error('컬럼 삭제 실패:', error);
@@ -404,17 +406,32 @@ function Board() {
     });
   };
 
-  const selectedColumns = boards[selectedBoard]?.columns || [];
+  const handleDragEnd = async (result) => {
+    if (!result.destination) return;
 
-  const chunkColumns = (columns, chunkSize) => {
-    const chunkedArray = [];
-    for (let i = 0; i < columns.length; i += chunkSize) {
-      chunkedArray.push(columns.slice(i, i + chunkSize));
+    const { source, destination } = result;
+
+    const reorderedStatuses = Array.from(statuses);
+    const [removed] = reorderedStatuses.splice(source.index, 1);
+    reorderedStatuses.splice(destination.index, 0, removed);
+
+    setStatuses(reorderedStatuses);
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      const currentStatusSequence = reorderedStatuses.map((status, index) => ({
+        statusId: status.statusId,
+        sequence: index,
+      }));
+      await axios.put(
+          `http://localhost:8080/boards/${boards[selectedBoard].id}/status/orders`,
+          currentStatusSequence,
+          { headers: { Authorization: `Bearer ${token}` } }
+      );
+    } catch (error) {
+      console.error('Error updating column order:', error);
     }
-    return chunkedArray;
   };
-
-  const chunkedColumns = chunkColumns(statuses, 3);
 
   return (
       <div className={styles.board}>
@@ -441,25 +458,44 @@ function Board() {
           <span className={styles.addColumnText}>Add Column</span>
         </div>
       </div>
-      <div>
-        {chunkedColumns.map((chunk, index) => (
-          <div key={index} className={styles.columns}>
-            {chunk.map((status) => (
-              <Column
-                key={status.statusId}
-                id={status.statusId}
-                title={status.title}
-                cards={status.cards || []}
-                onDeleteColumn={handleDeleteColumn}
-                onAddCard={handleAddCard}
-                onMoveCard={handleMoveCard}
-                boardId={boards[selectedBoard].id}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
-      <ColumnModal isOpen={isColumnModalOpen} onClose={() => setIsColumnModalOpen(false)} onAddColumn={handleAddColumn} />
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="columns" direction="horizontal">
+            {(provided) => (
+                <div
+                    className={styles.columns}
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                >
+                  {statuses.map((status, index) => (
+                      <Draggable key={status.statusId} draggableId={status.statusId.toString()} index={index}>
+                        {(provided) => (
+                            <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                className={styles.column}
+                            >
+                              <Column
+                                  id={status.statusId}
+                                  title={status.title}
+                                  cards={status.cards || []}
+                                  onDeleteColumn={handleDeleteColumn}
+                                  onAddCard={handleAddCard}
+                                  onMoveCard={handleMoveCard}
+                              />
+
+                            </div>
+                        )}
+                      </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+
+
+        <ColumnModal isOpen={isColumnModalOpen} onClose={() => setIsColumnModalOpen(false)} onAddColumn={handleAddColumn} />
       <AddBoardModal isOpen={isBoardModalOpen} onClose={() => setIsBoardModalOpen(false)} onAddBoard={handleAddBoard} />
       <EditBoardModal
         isOpen={isEditModalOpen}
