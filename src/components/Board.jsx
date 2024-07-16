@@ -9,6 +9,7 @@ import EditBoardModal from './BoardModal/EditBoardModal';
 import DeleteBoardModal from './BoardModal/DeleteBoardModal';
 import InviteUserModal from './BoardModal/InviteUserModal';
 import styles from '../styles/Board.module.css';
+
 function Board() {
   const [selectedBoard, setSelectedBoard] = useState('');
   const [boards, setBoards] = useState({});
@@ -54,7 +55,7 @@ function Board() {
 
       try {
         const token = localStorage.getItem('accessToken');
-        const response = await axios.get(`http://localhost:8080/boards/${selectedBoard}/status`, {
+        const response = await axios.get(`http://localhost:8080/boards/${boards[selectedBoard].id}/status`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setStatuses(response.data.result);
@@ -78,7 +79,7 @@ function Board() {
 
     try {
       const token = localStorage.getItem('accessToken');
-      await axios.delete(`http://localhost:8080/boards/${selectedBoard}/status/${columnId}`, {
+      await axios.delete(`http://localhost:8080/boards/${boards[selectedBoard].id}/status/${columnId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -119,7 +120,7 @@ function Board() {
 
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await axios.post(`http://localhost:8080/boards/${selectedBoard}/status`, { title }, {
+      const response = await axios.post(`http://localhost:8080/boards/${boards[selectedBoard].id}/status`, { title }, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -356,7 +357,7 @@ function Board() {
     return chunkedArray;
   };
 
-  const chunkedColumns = chunkColumns(selectedColumns, 3);
+  const chunkedColumns = chunkColumns(statuses, 3);
 
   return (
       <div className={styles.board}>
