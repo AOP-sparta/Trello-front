@@ -9,7 +9,6 @@ function InviteUserModal({ isOpen, onClose, onInvite }) {
     onInvite(email);
     setEmail('');
     onClose(); // 모달 닫기
-    alert(`${email} 초대를 완료했습니다.`);
   };
 
   return (

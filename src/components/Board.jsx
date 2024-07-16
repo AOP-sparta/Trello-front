@@ -341,16 +341,53 @@ function Board() {
     }
   };
 
+  // 보드 초대
   const handleInviteUser = () => {
     setIsInviteModalOpen(true);
   };
 
-  const sendInvitation = (email) => {
+  const sendInvitation = async (email) => {
     console.log(`Inviting user with email: ${email}`);
-    setIsInviteModalOpen(false);
-    alert('사용자 초대 성공');
+  
+    if (!selectedBoard || !boards[selectedBoard]) {
+      alert('Please select a board first.');
+      return;
+    }
+  
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.post(`http://localhost:8080/boards/${boards[selectedBoard].id}/invite`, {
+        email: email,
+      }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      if (response.status === 201) {
+        console.log('보드 초대 성공:', response.data);
+        alert('사용자 초대 성공');
+      } else {
+        alert('사용자 초대 실패');
+      }
+    } catch (error) {
+      console.error('사용자 초대 오류:', error);
+      if (error.response) {
+        if (error.response.status === 401) {
+          alert('인증 오류: 유효하지 않은 토큰입니다. 다시 로그인하세요.');
+        } else if (error.response.status === 403) {
+          alert('권한이 없습니다. 보드 관리자만 초대할 수 있습니다.');
+        } else if (error.response.status === 404) {
+          alert('보드를 찾을 수 없습니다. 다시 시도하세요.');
+        } else if (error.response.status === 400) {
+          alert('잘못된 요청입니다.');
+        } else {
+          alert('사용자 초대 중 오류가 발생했습니다.');
+        }
+      } else {
+        alert('서버와 통신 중 오류가 발생했습니다.');
+      }
+    }
   };
-
+  
   const handleMoveCard = (cardId, fromColumnId, toColumnId) => {
     setBoards((prevBoards) => {
       const updatedBoards = { ...prevBoards };
