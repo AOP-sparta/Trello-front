@@ -139,34 +139,6 @@ function Column({id, title, cards =[], onDeleteColumn, onAddCard, onMoveCard, bo
                 <MdAddCircleOutline size={24}/>
                 <div>Add card</div>
             </div>
-          {isEditing && (
-              <EditModal
-                  title="컬럼 수정"
-                  initialValue={columnTitle}
-                  onSave={handleSaveModal}
-                  onClose={handleCloseModal}
-              />
-          )}
-          {isDeleting && (
-              <DeleteModal
-                  title={`"${columnTitle}" 삭제`}
-                  content="정말로 삭제하시겠습니까?"
-                  onClose={handleCloseModal}
-                  onConfirm={handleConfirmDelete}
-                  confirmText="삭제"
-              />
-          )}
-          {isAddingCard && (
-              <CardModal
-                  onClose={handleCloseModal}
-                  onSave={handleSaveCard}
-                  boardId={boardId}
-                  id={id}
-              />
-          )}
-          {cards.map((card, index) => (
-              <Card key={index} id={card.id} columnId={id} text={card.text} user={card.user} />
-          ))}
         </div>
     );
 }
