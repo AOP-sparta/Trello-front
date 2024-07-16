@@ -10,11 +10,12 @@
     color: grey;
   }
 
-  .columns {
-    display: flex;
-    margin-bottom: 20px;
-  }
-  
+   .columns {
+     display: flex;
+     justify-content: center; /* 가운데 정렬 */
+     margin-bottom: 20px;
+   }
+
   .selectBoard {
     margin: 20px 0;
     display: flex;

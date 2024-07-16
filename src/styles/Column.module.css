@@ -1,10 +1,12 @@
 .column {
-    background-color: #f4f4f4;
-    padding: 10px;
-    border-radius: 7px;
-    margin: 0 10px;
-    width: 30%;
-  }
+  background-color: #f4f4f4;
+  padding: 10px;
+  border-radius: 7px;
+  margin: 0 10px; /* 컬럼 사이의 여백 */
+  flex: 1; /* 각 컬럼이 동일한 비율로 공간 차지 */
+  min-width: 200px; /* 최소 너비 설정 (선택적) */
+  width: 350px;
+}
 
   .columnHeader {
     display: flex;
