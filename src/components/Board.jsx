@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { MdAddCircleOutline, MdEdit } from 'react-icons/md';
 import { FaTrashAlt, FaUserPlus } from 'react-icons/fa';
-import axios from 'axios';
 import Column from './Column';
 import ColumnModal from './ColumnModal';
 import AddBoardModal from './BoardModal/AddBoardModal';
@@ -33,7 +33,11 @@ function Board() {
         // response.data.result의 구조가 [ { id, boardName, introduction }, ... ]인지 확인하세요.
         console.log(response.data.result); // 로그 추가
         const boardsData = response.data.result.reduce((acc, board) => {
-          acc[board.id] = board; // id를 키로 사용하여 boards 객체 생성
+          acc[board.boardName.trim()] = {
+            id: board.id,
+            columns: [],
+            description: board.introduction,
+          };
           return acc;
         }, {});
         setBoards(boardsData);
@@ -51,12 +55,10 @@ function Board() {
 
       try {
         const token = localStorage.getItem('accessToken');
-        const response = await axios.get(`http://localhost:8080/boards/${selectedBoard}/status`, {
+        const response = await axios.get(`http://localhost:8080/boards/${boards[selectedBoard].id}/status`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setStatuses(response.data.result);
-        console.log(statuses)
-        //console.log(response.data.result); // 상태가 잘 설정되었는지 확인
       } catch (error) {
         console.error('Error fetching statuses:', error);
       }
@@ -69,60 +71,149 @@ function Board() {
     setSelectedBoard(event.target.value);
   };
 
-  const handleDeleteColumn = (columnId) => {
-    setBoards((prevBoards) => {
-      const updatedBoards = { ...prevBoards };
-      updatedBoards[selectedBoard].columns = updatedBoards[selectedBoard].columns.filter(
-          (column) => column.id !== columnId
-      );
-      return updatedBoards;
-    });
+  const handleDeleteColumn = async (columnId) => {
+    if (!selectedBoard) {
+      alert('보드를 먼저 선택해주세요');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      await axios.delete(`http://localhost:8080/boards/${boards[selectedBoard].id}/status/${columnId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // 성공적으로 삭제된 후 로컬 상태 업데이트
+      setBoards((prevBoards) => {
+        const updatedBoards = { ...prevBoards };
+
+        // selectedBoard가 유효하고 columns가 존재하는지 확인
+        if (updatedBoards[selectedBoard] && updatedBoards[selectedBoard].columns) {
+          updatedBoards[selectedBoard].columns = updatedBoards[selectedBoard].columns.filter(
+              (column) => column.id !== columnId
+          );
+        }
+
+        return updatedBoards;
+      });
+      // 상태 업데이트 후, 상태를 최신으로 다시 가져오기
+      const fetchStatuses = async () => {
+        const token = localStorage.getItem('accessToken');
+        const response = await axios.get(`http://localhost:8080/boards/${boards[selectedBoard].id}/status`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setStatuses(response.data.result);
+      };
+
+      fetchStatuses();
+    } catch (error) {
+      console.error('컬럼 삭제 실패:', error);
+    }
   };
 
   const handleAddCard = (columnId, newCard) => {
     setBoards((prevBoards) => {
       const updatedBoards = { ...prevBoards };
-      const column = updatedBoards[selectedBoard].columns.find((column) => column.id === columnId);
-      if (column) {
-        column.cards.push(newCard);
+      const columnIndex = updatedBoards[selectedBoard].columns.findIndex((column) => column.id === columnId);
+      if (columnIndex !== -1) {
+        updatedBoards[selectedBoard].columns[columnIndex].cards.push(newCard);
       }
       return updatedBoards;
     });
   };
 
-  const handleAddColumn = (title) => {
+  const handleAddColumn = async (title) => {
     if (!selectedBoard) {
       alert('Please select a board first.');
       return;
     }
 
-    const newColumn = { id: new Date().getTime(), title: title, cards: [] };
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.post(`http://localhost:8080/boards/${boards[selectedBoard].id}/status`, { title }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    setBoards((prevBoards) => {
-      const updatedBoards = { ...prevBoards };
-      updatedBoards[selectedBoard].columns.push(newColumn);
-      return updatedBoards;
-    });
+      const newColumn = response.data.result;
 
-    setIsColumnModalOpen(false);
+      setBoards((prevBoards) => {
+        const updatedBoards = { ...prevBoards };
+
+        if (!updatedBoards[selectedBoard].columns) {
+          updatedBoards[selectedBoard].columns = [];
+        }
+
+        updatedBoards[selectedBoard].columns.push(newColumn);
+        return updatedBoards;
+      });
+
+      // 상태 업데이트 후, 상태를 최신으로 다시 가져오기
+      const fetchStatuses = async () => {
+        const token = localStorage.getItem('accessToken');
+        const response = await axios.get(`http://localhost:8080/boards/${boards[selectedBoard].id}/status`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setStatuses(response.data.result);
+      };
+
+      fetchStatuses();
+      setIsColumnModalOpen(false);
+    } catch (error) {
+      console.error('Error adding column:', error);
+    }
   };
 
-  const handleAddBoard = (boardName, boardDescription) => {
-    const newBoardKey = boardName.trim();
-    const newBoard = {
-      columns: [],
-      description: boardDescription,
-    };
-
-    setBoards((prevBoards) => ({
-      ...prevBoards,
-      [newBoardKey]: newBoard,
-    }));
-
-    setSelectedBoard(newBoardKey);
-    setIsBoardModalOpen(false);
+  const getAccessToken = () => {
+    return localStorage.getItem('accessToken');
   };
 
+  // 보드 추가
+  const handleAddBoard = async (boardName, boardDescription) => {
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+      alert('Access token is missing. Please log in.');
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://localhost:8080/boards', {
+        boardName: boardName,
+        introduction: boardDescription,
+      }, {
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.status === 201) {
+        const newBoard = response.data.result;
+
+        setBoards((prevBoards) => ({
+          ...prevBoards,
+          [newBoard.boardName.trim()]: {
+            id: newBoard.id,
+            columns: [],
+            description: newBoard.introduction,
+          },
+        }));
+
+        setSelectedBoard(newBoard.boardName.trim());
+        setIsBoardModalOpen(false);
+        console.log('보드 생성 응답 데이터:', response.data);
+      } else {
+        alert('보드 생성 실패');
+      }
+    } catch (error) {
+      console.error('보드 생성 오류:', error);
+      if (error.response && error.response.status === 403) {
+        alert('권한이 없습니다.');
+      } else {
+        alert('보드 생성 중 오류가 발생했습니다.');
+      }
+    }
+  };
+
+  // 보드 수정
   const handleEditBoard = () => {
     if (!selectedBoard) {
       alert('Please select a board first.');
@@ -132,30 +223,71 @@ function Board() {
     setEditBoardKey(selectedBoard);
     setEditBoardName(selectedBoard);
     setEditBoardDescription(boards[selectedBoard]?.description || '');
+
     setIsEditModalOpen(true);
   };
 
-  const handleSubmitEditBoard = () => {
+  const handleSubmitEditBoard = async () => {
     if (!editBoardKey || !editBoardName || !editBoardDescription) {
       alert('Please fill in all fields.');
       return;
     }
 
-    setBoards((prevBoards) => {
-      const updatedBoards = { ...prevBoards };
-      const updatedBoard = {
-        columns: updatedBoards[selectedBoard]?.columns || [],
-        description: editBoardDescription,
-      };
-      delete updatedBoards[selectedBoard];
-      updatedBoards[editBoardName] = updatedBoard;
-      return updatedBoards;
-    });
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+      alert('Access token is missing. Please log in.');
+      return;
+    }
 
-    setSelectedBoard(editBoardName);
-    setIsEditModalOpen(false);
+    const boardId = boards[selectedBoard].id;
+    const url = `http://localhost:8080/boards/${boardId}`;
+
+    try {
+      const response = await axios.put(url, {
+        boardName: editBoardName,
+        introduction: editBoardDescription,
+      }, {
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.status === 200) {
+        setBoards((prevBoards) => {
+          const updatedBoards = { ...prevBoards };
+          const updatedBoard = {
+            id: boardId,
+            columns: updatedBoards[selectedBoard]?.columns || [],
+            description: editBoardDescription,
+          };
+          delete updatedBoards[selectedBoard];
+          updatedBoards[editBoardName] = updatedBoard;
+          return updatedBoards;
+        });
+
+        setSelectedBoard(editBoardName);
+        setIsEditModalOpen(false);
+        console.log('보드 수정 응답 데이터:', response.data);
+      } else {
+        alert('보드 수정 실패');
+      }
+    } catch (error) {
+      console.error('보드 수정 오류:', error);
+      if (error.response) {
+        if (error.response.status === 401) {
+          alert('인증 오류: 유효하지 않은 토큰입니다. 다시 로그인하세요.');
+        } else if (error.response.status === 400) {
+          alert('잘못된 요청입니다.');
+        } else {
+          alert('보드 수정 중 오류가 발생했습니다.');
+        }
+      } else {
+        alert('서버와 통신하는 중 오류가 발생했습니다.');
+      }
+    }
   };
 
+  // 보드 삭제
   const handleDeleteBoard = () => {
     if (!selectedBoard) {
       alert('Please select a board first.');
@@ -165,36 +297,107 @@ function Board() {
     setIsDeleteModalOpen(true);
   };
 
-  const confirmDeleteBoard = () => {
-    setBoards((prevBoards) => {
-      const updatedBoards = { ...prevBoards };
-      delete updatedBoards[selectedBoard];
-      return updatedBoards;
-    });
+  const confirmDeleteBoard = async () => {
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+      alert('Access token is missing. Please log in.');
+      return;
+    }
 
-    setSelectedBoard('');
-    setIsDeleteModalOpen(false);
+    const selectedBoardData = boards[selectedBoard];
+    if (!selectedBoardData || !selectedBoardData.id) {
+      alert('Selected board does not have a valid ID.');
+      return;
+    }
+
+    const boardId = selectedBoardData.id;
+    const url = `http://localhost:8080/boards/${boardId}`;
+
+    try {
+      const response = await axios.delete(url, {
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.status === 200) {
+        const updatedBoards = { ...boards };
+        delete updatedBoards[selectedBoard];
+        setBoards(updatedBoards);
+        setSelectedBoard('');
+        setIsDeleteModalOpen(false);
+        console.log('보드 삭제 응답 데이터:', response.data);
+        alert('보드 삭제 성공');
+      } else {
+        alert('보드 삭제 실패');
+      }
+    } catch (error) {
+      console.error('보드 삭제 오류:', error);
+      if (error.response && error.response.status === 403) {
+        alert('권한이 없습니다.');
+      } else {
+        alert('보드 삭제 중 오류가 발생했습니다.');
+      }
+    }
   };
 
+  // 보드 초대
   const handleInviteUser = () => {
     setIsInviteModalOpen(true);
   };
 
-  const sendInvitation = (email) => {
+  const sendInvitation = async (email) => {
     console.log(`Inviting user with email: ${email}`);
-    setIsInviteModalOpen(false);
+  
+    if (!selectedBoard || !boards[selectedBoard]) {
+      alert('Please select a board first.');
+      return;
+    }
+  
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.post(`http://localhost:8080/boards/${boards[selectedBoard].id}/invite`, {
+        email: email,
+      }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      if (response.status === 201) {
+        console.log('보드 초대 성공:', response.data);
+        alert('사용자 초대 성공');
+      } else {
+        alert('사용자 초대 실패');
+      }
+    } catch (error) {
+      console.error('사용자 초대 오류:', error);
+      if (error.response) {
+        if (error.response.status === 401) {
+          alert('인증 오류: 유효하지 않은 토큰입니다. 다시 로그인하세요.');
+        } else if (error.response.status === 403) {
+          alert('권한이 없습니다. 보드 관리자만 초대할 수 있습니다.');
+        } else if (error.response.status === 404) {
+          alert('보드를 찾을 수 없습니다. 다시 시도하세요.');
+        } else if (error.response.status === 400) {
+          alert('잘못된 요청입니다.');
+        } else {
+          alert('사용자 초대 중 오류가 발생했습니다.');
+        }
+      } else {
+        alert('서버와 통신 중 오류가 발생했습니다.');
+      }
+    }
   };
-
+  
   const handleMoveCard = (cardId, fromColumnId, toColumnId) => {
     setBoards((prevBoards) => {
       const updatedBoards = { ...prevBoards };
-      const fromColumn = updatedBoards[selectedBoard].columns.find(column => column.id === fromColumnId);
-      const toColumn = updatedBoards[selectedBoard].columns.find(column => column.id === toColumnId);
+      const fromColumnIndex = updatedBoards[selectedBoard].columns.findIndex((column) => column.id === fromColumnId);
+      const toColumnIndex = updatedBoards[selectedBoard].columns.findIndex((column) => column.id === toColumnId);
 
-      if (fromColumn && toColumn) {
-        const cardIndex = fromColumn.cards.findIndex(card => card.id === cardId);
-        const [movedCard] = fromColumn.cards.splice(cardIndex, 1);
-        toColumn.cards.push(movedCard);
+      if (fromColumnIndex !== -1 && toColumnIndex !== -1) {
+        const cardIndex = updatedBoards[selectedBoard].columns[fromColumnIndex].cards.findIndex((card) => card.id === cardId);
+        const [movedCard] = updatedBoards[selectedBoard].columns[fromColumnIndex].cards.splice(cardIndex, 1);
+        updatedBoards[selectedBoard].columns[toColumnIndex].cards.push(movedCard);
       }
 
       return updatedBoards;
@@ -222,69 +425,60 @@ function Board() {
         <FaTrashAlt onClick={handleDeleteBoard} className={styles.boardIcon} size={23}/>
         <FaUserPlus onClick={handleInviteUser} className={styles.boardIcon} size={24}/>
       </span>
-        <div className={styles.boardHeader}>
-          <h1>{selectedBoard || '보드 이름'}</h1>
-          <p>{boards[selectedBoard]?.description || '보드 한 줄 설명'}</p>
-        </div>
-        <div className={styles.selectBoard}>
-          <select id="board-select" value={selectedBoard} onChange={handleBoardChange}>
-            <option value="" disabled>보드 선택</option>
-            {Object.entries(boards).map(([boardKey, boardData]) => (
-                <option key={boardKey} value={boardKey}>{boardData.boardName}</option> // boardName으로 수정
-            ))}
-          </select>
-          <div className={styles.addColumnButton} onClick={() => setIsColumnModalOpen(true)}>
-            <MdAddCircleOutline className={styles.addColumnIcon} size={24}/>
-            <span className={styles.addColumnText}>Add Column</span>
-          </div>
-        </div>
-        <div>
-          {chunkedColumns.map((chunk, index) => (
-              <div key={index} className={styles.columns}>
-                {chunk.map((status) => (
-                    <Column
-                        key={status.statusId}
-                        id={status.statusId}
-                        title={status.title}
-                        cards={status.cards || []} // cards가 undefined일 경우 빈 배열로 초기화
-                        onDeleteColumn={handleDeleteColumn}
-                        onAddCard={handleAddCard}
-                        onMoveCard={handleMoveCard}
-                    />
-                ))}
-              </div>
-          ))}
-        </div>
-        <ColumnModal
-            isOpen={isColumnModalOpen}
-            onClose={() => setIsColumnModalOpen(false)}
-            onAddColumn={handleAddColumn}
-        />
-        <AddBoardModal
-            isOpen={isBoardModalOpen}
-            onClose={() => setIsBoardModalOpen(false)}
-            onAddBoard={handleAddBoard}
-        />
-        <EditBoardModal
-            isOpen={isEditModalOpen}
-            onClose={() => setIsEditModalOpen(false)}
-            boardName={editBoardName}
-            boardDescription={editBoardDescription}
-            onSubmit={handleSubmitEditBoard}
-            onNameChange={setEditBoardName}
-            onDescriptionChange={setEditBoardDescription}
-        />
-        <DeleteBoardModal
-            isOpen={isDeleteModalOpen}
-            onClose={() => setIsDeleteModalOpen(false)}
-            onDelete={confirmDeleteBoard}
-        />
-        <InviteUserModal
-            isOpen={isInviteModalOpen}
-            onClose={() => setIsInviteModalOpen(false)}
-            onInvite={sendInvitation}
-        />
+      <div className={styles.boardHeader}>
+        <h1>{selectedBoard || '보드 이름'}</h1>
+        <p>{boards[selectedBoard]?.description || '보드 한 줄 설명'}</p>
       </div>
+      <div className={styles.selectBoard}>
+        <select id="board-select" value={selectedBoard} onChange={handleBoardChange}>
+          <option value="" disabled>보드 선택</option>
+          {Object.keys(boards).map((boardKey) => (
+            <option key={boards[boardKey].id} value={boardKey}>{boardKey}</option>
+          ))}
+        </select>
+        <div className={styles.addColumnButton} onClick={() => setIsColumnModalOpen(true)}>
+          <MdAddCircleOutline className={styles.addColumnIcon} size={24} />
+          <span className={styles.addColumnText}>Add Column</span>
+        </div>
+      </div>
+      <div>
+        {chunkedColumns.map((chunk, index) => (
+          <div key={index} className={styles.columns}>
+            {chunk.map((status) => (
+              <Column
+                key={status.statusId}
+                id={status.statusId}
+                title={status.title}
+                cards={status.cards || []}
+                onDeleteColumn={handleDeleteColumn}
+                onAddCard={handleAddCard}
+                onMoveCard={handleMoveCard}
+                boardId={boards[selectedBoard].id}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+      <ColumnModal isOpen={isColumnModalOpen} onClose={() => setIsColumnModalOpen(false)} onAddColumn={handleAddColumn} />
+      <AddBoardModal isOpen={isBoardModalOpen} onClose={() => setIsBoardModalOpen(false)} onAddBoard={handleAddBoard} />
+      <EditBoardModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        boardName={editBoardName}
+        boardDescription={editBoardDescription}
+        onSubmit={handleSubmitEditBoard}
+        onNameChange={setEditBoardName}
+        onDescriptionChange={setEditBoardDescription}
+      />
+      <DeleteBoardModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onDelete={confirmDeleteBoard}
+      />
+      <InviteUserModal isOpen={isInviteModalOpen}
+      onClose={() => setIsInviteModalOpen(false)}
+      onInvite={sendInvitation} />
+    </div>
   );
 }
 

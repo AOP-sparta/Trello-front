@@ -11,7 +11,7 @@ import DeleteModal from './DeleteModal';
 import CardModal from './CardModal';
 import board from "./Board";
 
-function Column({id, title, cards, onDeleteColumn, onAddCard, onMoveCard, boardId}) {
+function Column({id, title, cards =[], onDeleteColumn, onAddCard, onMoveCard, boardId}) {
     const [isEditing, setIsEditing] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [columnTitle, setColumnTitle] = useState(title);
@@ -139,6 +139,34 @@ function Column({id, title, cards, onDeleteColumn, onAddCard, onMoveCard, boardI
                 <MdAddCircleOutline size={24}/>
                 <div>Add card</div>
             </div>
+          {isEditing && (
+              <EditModal
+                  title="컬럼 수정"
+                  initialValue={columnTitle}
+                  onSave={handleSaveModal}
+                  onClose={handleCloseModal}
+              />
+          )}
+          {isDeleting && (
+              <DeleteModal
+                  title={`"${columnTitle}" 삭제`}
+                  content="정말로 삭제하시겠습니까?"
+                  onClose={handleCloseModal}
+                  onConfirm={handleConfirmDelete}
+                  confirmText="삭제"
+              />
+          )}
+          {isAddingCard && (
+              <CardModal
+                  onClose={handleCloseModal}
+                  onSave={handleSaveCard}
+                  boardId={boardId}
+                  id={id}
+              />
+          )}
+          {cards.map((card, index) => (
+              <Card key={index} id={card.id} columnId={id} text={card.text} user={card.user} />
+          ))}
         </div>
     );
 }
