@@ -96,6 +96,16 @@ function Board() {
 
         return updatedBoards;
       });
+      // 상태 업데이트 후, 상태를 최신으로 다시 가져오기
+      const fetchStatuses = async () => {
+        const token = localStorage.getItem('accessToken');
+        const response = await axios.get(`http://localhost:8080/boards/${boards[selectedBoard].id}/status`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setStatuses(response.data.result);
+      };
+
+      fetchStatuses();
     } catch (error) {
       console.error('컬럼 삭제 실패:', error);
     }
@@ -137,6 +147,16 @@ function Board() {
         return updatedBoards;
       });
 
+      // 상태 업데이트 후, 상태를 최신으로 다시 가져오기
+      const fetchStatuses = async () => {
+        const token = localStorage.getItem('accessToken');
+        const response = await axios.get(`http://localhost:8080/boards/${boards[selectedBoard].id}/status`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setStatuses(response.data.result);
+      };
+
+      fetchStatuses();
       setIsColumnModalOpen(false);
     } catch (error) {
       console.error('Error adding column:', error);
