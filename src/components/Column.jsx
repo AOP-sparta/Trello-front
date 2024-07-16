@@ -132,7 +132,7 @@ function Column({id, title, cards =[], onDeleteColumn, onAddCard, onMoveCard, bo
                     />
                 )}
                 {cardList.map((card, index) => (
-                    <Card key={index} id={card.id} columnId={id} text={card.title} user={card.nickname}/>
+                    <Card key={index} id={card.id} columnId={id} text={card.title} user={card.nickname} boardId = {boardId}/>
                 ))}
             </div>
             <div className={styles.addCardIcon} onClick={handleAddCardClick}>
